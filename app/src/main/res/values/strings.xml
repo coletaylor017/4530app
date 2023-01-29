@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Lifestyle App</string>
+    <string name="bmr_header">Your basal metabolic rate:</string>
+    <string name="height_label">Height:</string>
+    <string name="weight_label">Weight:</string>
 </resources>

@@ -1,10 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!--   color for the app bar and other primary UI elements -->
+    <color name="colorPrimary">#60b4f4</color>
+
+    <!--   a darker variant of the primary color, used for buttons
+           and other action items  -->
+    <color name="colorPrimaryDark">#1985c1</color>
+
+    <!--   a lighter variant of the primary color, used for headlines
+        and miscellaneous -->
+    <color name="colorPrimaryLight">#97e6ff</color>
+
+    <!--   a secondary color for controls like checkboxes and sidebars/designs -->
+    <color name="colorAccent">#66bb6a</color>
+
+    <!--   a darker variant of secondary color  -->
+    <color name="colorAccentDark">#338a3e</color>
+
+    <!--   a lighter variant of secondary color  -->
+    <color name="colorAccentLight">#98ee99</color>
+
+    <!--  text color for darker backgrounds  -->
+    <color name="colorOnPrimary">#ffffff</color>
+
+    <!--  text color for lighter backgrounds  -->
+    <color name="colorOnAccent">#000000</color>
+
 </resources>

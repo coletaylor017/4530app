@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ProfileDisplayActivity"
+    android:padding="16dp"
+    >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:text="@string/height_label"
+        android:id="@+id/height_label"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_toEndOf="@id/height_label"
+        tools:text="6'0''"
+        android:id="@+id/height_value"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/height_label"
+        android:layout_marginTop="8dp"
+        android:text="@string/weight_label"
+        android:id="@+id/weight_label"
+        />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_below="@id/height_label"
+        android:layout_toEndOf="@id/weight_label"
+        tools:text="100 lbs"
+        android:id="@+id/weight_value"
+        />
+
+    <TextView
+        android:id="@+id/bmr_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/weight_value"
+        android:layout_centerHorizontal="true"
+        android:text="@string/bmr_header"
+        style="@style/Title.Small" />
+
+    <TextView
+        android:id="@+id/bmr_score"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@id/bmr_header"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/bmr_circle"
+        android:gravity="center"
+        android:layout_marginTop="10dp"
+        android:text="BMR Score"
+        android:textColor="#000000"
+        android:textSize="14sp" />
+
+
+</RelativeLayout>
