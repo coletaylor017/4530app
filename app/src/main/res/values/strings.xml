@@ -1,6 +1,15 @@
 <resources>
     <string name="app_name">Lifestyle App</string>
-    <string name="bmr_header">Your basal metabolic rate:</string>
+
+    <!--   profile text field labels -->
     <string name="height_label">Height:</string>
     <string name="weight_label">Weight:</string>
+
+    <!--   Titles and subtitles -->
+    <string name="bmr_header">Your basal metabolic rate:</string>
+
+    <!--   Navigation labels -->
+    <string name="menu_profile">Profile</string>
+    <string name="menu_hikes">Hikes</string>
+    <string name="menu_weather">Weather</string>
 </resources>

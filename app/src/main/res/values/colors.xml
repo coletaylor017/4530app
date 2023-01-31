@@ -12,18 +12,18 @@
     <color name="colorPrimaryLight">#97e6ff</color>
 
     <!--   a secondary color for controls like checkboxes and sidebars/designs -->
-    <color name="colorAccent">#66bb6a</color>
+    <color name="colorSecondary">#66bb6a</color>
 
     <!--   a darker variant of secondary color  -->
-    <color name="colorAccentDark">#338a3e</color>
+    <color name="colorSecondaryDark">#338a3e</color>
 
     <!--   a lighter variant of secondary color  -->
-    <color name="colorAccentLight">#98ee99</color>
+    <color name="colorSecondaryLight">#98ee99</color>
 
     <!--  text color for darker backgrounds  -->
     <color name="colorOnPrimary">#ffffff</color>
 
     <!--  text color for lighter backgrounds  -->
-    <color name="colorOnAccent">#000000</color>
+    <color name="colorOnSecondary">#000000</color>
 
 </resources>
