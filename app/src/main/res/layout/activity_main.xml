@@ -1,73 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:padding="16dp"
+    android:padding="26dp"
+    android:orientation="vertical"
     >
 
-    <TextView
-        android:id="@+id/tv_hw"
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="Hello World!" />
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:text="Button 1"
-        android:id="@+id/button_1"
-        />
+        android:layout_marginBottom="20dp"
+        >
 
-    <Button
-        android:id="@+id/PhotoButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/button_1"
-        android:layout_marginTop="18dp"
-        android:layout_marginRight="-86dp"
-        android:layout_toLeftOf="@id/button_1"
-        android:text="photo" />
+        <ImageView
+            android:id="@+id/iv_pic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:srcCompat="@tools:sample/avatars" />
 
-    <ImageView
-        android:id="@+id/iv_pic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:srcCompat="@tools:sample/avatars" />
+        <Button
+            android:id="@+id/PhotoButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_alignBottom="@id/iv_pic"
+            android:layout_alignParentRight="true"
+            android:text="Upload Photo" />
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_centerVertical="true"
+        android:orientation="vertical"
         >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Name:"
-            android:layout_weight="0"
-            android:layout_marginRight="8dp"
+            android:text="First Name"
+            android:labelFor="@+id/firstNameInput"
             />
         <EditText
-            android:layout_width="32dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_toLeftOf="@id/button_submit"
+            android:hint="Cosmo"
+            android:textColorHint="@color/lightGrey"
+            android:backgroundTint="@color/lightGrey"
+            android:id="@+id/firstNameInput"
+            android:layout_marginBottom="15dip"
             />
-        <Button
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="submit"
-            android:id="@+id/button_submit"
-            android:layout_weight="0"
+            android:text="Last Name"
+            android:labelFor="@+id/lastNameInput"
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Kramer"
+            android:textColorHint="@color/lightGrey"
+            android:backgroundTint="@color/lightGrey"
+            android:id="@+id/lastNameInput"
+            android:layout_marginBottom="15dip"
             />
 
-    </LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Age"
+            android:labelFor="@+id/ageInput"
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="69"
+            android:inputType="number"
+            android:textColorHint="@color/lightGrey"
+            android:backgroundTint="@color/lightGrey"
+            android:id="@+id/ageInput"
+            android:layout_marginBottom="15dip"
+            />
 
-</RelativeLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="City"
+            android:labelFor="@+id/cityInput"
+            />
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="New York City"
+            android:textColorHint="@color/lightGrey"
+            android:backgroundTint="@color/lightGrey"
+            android:id="@+id/cityInput"
+            android:layout_marginBottom="15dip"
+            />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:layout_alignParentRight="true"
+        android:text="submit"
+        android:id="@+id/button_submit"
+            />
+
+</LinearLayout>
