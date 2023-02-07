@@ -1,114 +1,218 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
-    android:padding="26dp"
-    android:orientation="vertical"
-    >
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
         >
-
-        <ImageView
-            android:id="@+id/iv_pic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:srcCompat="@tools:sample/avatars" />
-
-        <Button
-            android:id="@+id/PhotoButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:layout_alignBottom="@id/iv_pic"
-            android:layout_alignParentRight="true"
-            android:text="Upload Photo" />
-    </RelativeLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:padding="26dp"
         android:orientation="vertical"
         >
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="First Name"
-            android:labelFor="@+id/firstNameInput"
-            />
-        <EditText
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Cosmo"
-            android:textColorHint="@color/lightGrey"
-            android:backgroundTint="@color/lightGrey"
-            android:id="@+id/firstNameInput"
-            android:layout_marginBottom="15dip"
-            />
+            android:layout_marginBottom="20dp"
+            >
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Last Name"
-            android:labelFor="@+id/lastNameInput"
-            />
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Kramer"
-            android:textColorHint="@color/lightGrey"
-            android:backgroundTint="@color/lightGrey"
-            android:id="@+id/lastNameInput"
-            android:layout_marginBottom="15dip"
-            />
+            <ImageView
+                android:id="@+id/iv_pic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:srcCompat="@tools:sample/avatars" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Age"
-            android:labelFor="@+id/ageInput"
-            />
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="69"
-            android:inputType="number"
-            android:textColorHint="@color/lightGrey"
-            android:backgroundTint="@color/lightGrey"
-            android:id="@+id/ageInput"
-            android:layout_marginBottom="15dip"
-            />
+            <Button
+                android:id="@+id/PhotoButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:layout_alignBottom="@id/iv_pic"
+                android:layout_alignParentRight="true"
+                android:text="Upload Photo" />
+        </RelativeLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="City"
-            android:labelFor="@+id/cityInput"
-            />
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="New York City"
-            android:textColorHint="@color/lightGrey"
-            android:backgroundTint="@color/lightGrey"
-            android:id="@+id/cityInput"
-            android:layout_marginBottom="15dip"
-            />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="First Name"
+                android:labelFor="@+id/firstNameInput"
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Cosmo"
+                android:textColorHint="@color/lightGrey"
+                android:backgroundTint="@color/lightGrey"
+                android:id="@+id/firstNameInput"
+                android:layout_marginBottom="15dip"
+                />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:layout_alignParentRight="true"
-        android:text="submit"
-        android:id="@+id/button_submit"
-            />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Last Name"
+                android:labelFor="@+id/lastNameInput"
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Kramer"
+                android:textColorHint="@color/lightGrey"
+                android:backgroundTint="@color/lightGrey"
+                android:id="@+id/lastNameInput"
+                android:layout_marginBottom="15dip"
+                />
 
-</LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Age"
+                android:labelFor="@+id/ageInput"
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="40"
+                android:inputType="number"
+                android:textColorHint="@color/lightGrey"
+                android:backgroundTint="@color/lightGrey"
+                android:id="@+id/ageInput"
+                android:layout_marginBottom="15dip"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="City"
+                android:labelFor="@+id/cityInput"
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="New York City"
+                android:textColorHint="@color/lightGrey"
+                android:backgroundTint="@color/lightGrey"
+                android:id="@+id/cityInput"
+                android:layout_marginBottom="15dip"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Country"
+                android:labelFor="@+id/countryInput"
+                />
+            <Spinner
+                android:id="@+id/countryInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Height"
+                android:labelFor="@+id/countryInput"
+                android:layout_marginBottom="10dp"
+                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp"
+                >
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Feet"
+                        android:labelFor="@+id/heightFeetInput"
+                        />
+                    <Spinner
+                        android:id="@+id/heightFeetInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    >
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Inches"
+                        android:labelFor="@+id/heightInchesInput"
+                        />
+                    <Spinner
+                        android:id="@+id/heightInchesInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Weight (lbs)"
+                android:labelFor="@+id/weightInput"
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="190"
+                android:inputType="number"
+                android:textColorHint="@color/lightGrey"
+                android:backgroundTint="@color/lightGrey"
+                android:id="@+id/weightInput"
+                android:layout_marginBottom="15dip"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sex"
+                android:labelFor="@+id/sexInput"
+                />
+            <Spinner
+                android:id="@+id/sexInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Activity Level"
+                android:labelFor="@+id/activityLevelInput"
+                />
+            <Spinner
+                android:id="@+id/activityLevelInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_alignParentRight="true"
+                android:text="submit"
+                android:id="@+id/button_submit"
+                    />
+
+    </LinearLayout>
+</ScrollView>

@@ -69,4 +69,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    // Note: Cosmo Kramer is 6'3" and born in 1949
+
 }
