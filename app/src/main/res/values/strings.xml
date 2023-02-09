@@ -2,8 +2,13 @@
     <string name="app_name">Lifestyle App</string>
 
     <!--   profile text field labels -->
+    <string name="name_label">Name:</string>
+    <string name="age_label">Age:</string>
+    <string name="location_label">Location:</string>
     <string name="height_label">Height:</string>
     <string name="weight_label">Weight:</string>
+    <string name="sex_label">Sex:</string>
+    <string name="activity_level_label">Activity Level:</string>
 
     <!--   Titles and subtitles -->
     <string name="bmr_header">Your basal metabolic rate:</string>

@@ -26,4 +26,6 @@
     <!--  text color for lighter backgrounds  -->
     <color name="colorOnSecondary">#000000</color>
 
+    <color name="lightGrey">#bebebe</color>
+
 </resources>
