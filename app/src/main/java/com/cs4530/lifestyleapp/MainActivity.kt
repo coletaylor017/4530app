@@ -81,11 +81,42 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
                 }
             }
             R.id.button_submit -> {
-                // TODO: for now this is hardcoded to pass a height and weight value
+                val firstNameTextEdit : EditText? = findViewById(R.id.firstNameInput)
+                val firstNameValue : String = firstNameTextEdit!!.text.toString()
+                val lastNameTextEdit : EditText? = findViewById(R.id.lastNameInput)
+                val lastNameValue : String = lastNameTextEdit!!.text.toString()
+
+                val ageTextEdit : EditText? = findViewById(R.id.ageInput)
+                val ageValue = Integer.parseInt(ageTextEdit!!.text.toString())
+
+                val cityTextEdit : EditText? = findViewById(R.id.cityInput)
+                val cityValue : String = cityTextEdit!!.text.toString()
+                val countrySpinner : Spinner? = findViewById(R.id.countryInput)
+                val countryValue : String = countrySpinner!!.selectedItem.toString()
+
+                val heightFeetSpinner : Spinner? = findViewById(R.id.heightFeetInput)
+                val heightFeetValue : Int = Integer.parseInt(heightFeetSpinner!!.selectedItem.toString())
+                val heightInchesSpinner : Spinner? = findViewById(R.id.heightFeetInput)
+                val heightInchesValue : Int = Integer.parseInt(heightInchesSpinner!!.selectedItem.toString())
+
+                val weightTextEdit : EditText? = findViewById(R.id.weightInput)
+                val weightValue = Integer.parseInt(weightTextEdit!!.text.toString())
+
+                val sexSpinner : Spinner? = findViewById(R.id.sexInput)
+                val sexValue : String = sexSpinner!!.selectedItem.toString()
+
+                val activityLevelSpinner : Spinner? = findViewById(R.id.activityLevelInput)
+                val activityLevelValue : String = activityLevelSpinner!!.selectedItem.toString()
+
                 //Start an activity and pass the data to it.
                 val messageIntent = Intent(this, ProfileDisplayActivity::class.java)
-                messageIntent.putExtra("HEIGHT", "6'0\"")
-                messageIntent.putExtra("WEIGHT", "100")
+                messageIntent.putExtra("NAME", "$firstNameValue $lastNameValue")
+                messageIntent.putExtra("AGE", ageValue)
+                messageIntent.putExtra("LOCATION", "$cityValue, $countryValue")
+                messageIntent.putExtra("HEIGHT", heightFeetValue * 12 + heightInchesValue)
+                messageIntent.putExtra("WEIGHT", weightValue)
+                messageIntent.putExtra("SEX", sexValue)
+                messageIntent.putExtra("ACTIVITY_LEVEL", activityLevelValue)
                 this.startActivity(messageIntent)
             }
         }
