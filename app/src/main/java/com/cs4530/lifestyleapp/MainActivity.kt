@@ -6,11 +6,13 @@ import android.os.Bundle
 import android.content.Intent
 import android.provider.MediaStore
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Build
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
-
+import java.io.File
+import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
     // Variables for UI elements
@@ -42,7 +44,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         setSpinnerDataString(R.id.sexInput, sexOptions)
         setSpinnerDataString(R.id.activityLevelInput, activityLevelOptions)
 
+        /** The next few lines retrieve the photo from cache and redraw them **/
+        var bits : Bitmap? = getBitmapFromCache()
+        if(bits != null) {
+            mIvPic = findViewById<View>(R.id.iv_pic) as ImageView
+            mIvPic!!.setImageBitmap(bits)
+        }
+
     }
+
+
 
     private fun setSpinnerDataString(spinnerId: Int, spinnerOptions: Array<String>) {
         val targetSpinner = findViewById<Spinner>(spinnerId)
@@ -122,6 +133,10 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         }
     }
 
+    /**
+     * This function/method is near identical to the class example.
+     * This enables the intent for the camera and image retrieval.
+     */
     private val cameraActivity = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){result ->
         if(result.resultCode == RESULT_OK) {
             mIvPic = findViewById<View>(R.id.iv_pic) as ImageView
@@ -131,11 +146,52 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
             if (Build.VERSION.SDK_INT >= 33) {
                 val thumbnailImage = result.data!!.getParcelableExtra("data", Bitmap::class.java)
                 mIvPic!!.setImageBitmap(thumbnailImage)
+                if (thumbnailImage != null) { /** This saves the thumbnail to cache **/
+                    saveBitmapToCache(thumbnailImage)
+                }
             }
             else {
                 val thumbnailImage = result.data!!.getParcelableExtra<Bitmap>("data")
                 mIvPic!!.setImageBitmap(thumbnailImage)
+
+                if (thumbnailImage != null) { /** This saves the thumbnail to cache **/
+                    saveBitmapToCache(thumbnailImage)
+                }
             }
+        }
+    }
+
+    /**
+     * This method/function is hardcoded to save the photo to the cache.
+     * This is used in [cameraActivity]
+     */
+    private fun saveBitmapToCache(bitmap: Bitmap) {
+        val fileName = "photo.png"
+        val file = File(cacheDir, fileName)
+        val outputStream = FileOutputStream(file)
+
+        try {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            outputStream.flush()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            outputStream.close()
+        }
+    }
+
+    /**
+     * This method/function is hardcoded to retrieve the profile photo from the cache.
+     * This is used in [onCreate]
+     */
+    private fun getBitmapFromCache(): Bitmap? {
+        val fileName = "photo.png"
+        val file = File(cacheDir, fileName)
+
+        return if (file.exists()) {
+            BitmapFactory.decodeFile(file.absolutePath)
+        } else {
+            null
         }
     }
 
