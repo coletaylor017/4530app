@@ -17,4 +17,7 @@
     <string name="menu_profile">Profile</string>
     <string name="menu_hikes">Hikes</string>
     <string name="menu_weather">Weather</string>
+
+    <!-- Button labels -->
+    <string name="bmr_button">BMR</string>
 </resources>

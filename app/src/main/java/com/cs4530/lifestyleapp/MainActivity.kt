@@ -8,13 +8,15 @@ import android.provider.MediaStore
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Build
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.material.navigation.NavigationBarView
 import java.io.File
 import java.io.FileOutputStream
 
-class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
+class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener, NavigationBarView.OnItemSelectedListener {
     // Variables for UI elements
     private var mButtonCamera: Button? = null
     private var mButtonSubmit: Button? = null
@@ -52,8 +54,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         }
 
     }
-
-
 
     private fun setSpinnerDataString(spinnerId: Int, spinnerOptions: Array<String>) {
         val targetSpinner = findViewById<Spinner>(spinnerId)
@@ -204,5 +204,20 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when(item.itemId) {
+            R.id.action_profile -> {
+                // Respond to navigation item 1 click
+                true
+            }
+            R.id.action_weather -> {
+                // Respond to navigation item 2 click
+                true
+            }
+            else -> false
+        }
+        return true
+    }
 
 }
