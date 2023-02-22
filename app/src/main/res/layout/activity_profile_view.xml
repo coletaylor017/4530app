@@ -87,9 +87,6 @@
         </TableRow>
     </TableLayout>
 
-
-
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -97,7 +94,6 @@
             android:id="@+id/bmr_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/weight_value"
             android:layout_centerHorizontal="true"
             android:text="@string/bmr_header"
             style="@style/Title.Small" />
@@ -116,5 +112,12 @@
             android:textSize="14sp" />
     </RelativeLayout>
 
+    <!-- Feel free to move this from the linear layout. -->
+    <!-- Assignment says top right. -->
+    <ImageView
+        android:id="@+id/profile_pic"
+        android:layout_width="fill_parent"
+        android:layout_height="171dp"
+        tools:srcCompat="@tools:sample/avatars" />
 
 </LinearLayout>

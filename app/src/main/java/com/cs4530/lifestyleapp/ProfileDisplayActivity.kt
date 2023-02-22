@@ -1,8 +1,13 @@
 package com.cs4530.lifestyleapp
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.TextView
 import android.os.Bundle
+import android.view.View
+import android.widget.ImageView
+import java.io.File
 
 class ProfileDisplayActivity : AppCompatActivity() {
 
@@ -14,6 +19,7 @@ class ProfileDisplayActivity : AppCompatActivity() {
     private var sexReceived : String? = null
     private var activityLevelReceived : String? = null
     private var bmrScore: TextView? = null
+    private var mIvPic: ImageView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +56,13 @@ class ProfileDisplayActivity : AppCompatActivity() {
             val bmr = calculateBMR(heightReceived!!, weightReceived!!, sexReceived!!, ageReceived!!)
             bmrScore!!.text = bmr.toString()
         }
+
+        /** The next few lines retrieve the photo from cache and redraw them **/
+        var bits : Bitmap? = getBitmapFromCache()
+        if(bits != null) {
+            mIvPic = findViewById<View>(R.id.profile_pic) as ImageView
+            mIvPic!!.setImageBitmap(bits)
+        }
     }
 
     /* BMR calculation:
@@ -64,5 +77,20 @@ class ProfileDisplayActivity : AppCompatActivity() {
             return (66.47 + (6.24 * weight) + (12.7 * height) - (6.75 * age)).toInt()
         }
         return 0
+    }
+
+    /**
+     * This method/function is hardcoded to retrieve the profile photo from the cache.
+     * This is used in [onCreate]
+     */
+    private fun getBitmapFromCache(): Bitmap? {
+        val fileName = "photo.png"
+        val file = File(cacheDir, fileName)
+
+        return if (file.exists()) {
+            BitmapFactory.decodeFile(file.absolutePath)
+        } else {
+            null
+        }
     }
 }
