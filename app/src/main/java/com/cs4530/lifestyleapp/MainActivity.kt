@@ -1,15 +1,28 @@
 package com.cs4530.lifestyleapp
 
+import android.Manifest
 import android.content.ActivityNotFoundException
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
 import android.content.Intent
-import android.provider.MediaStore
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.location.Address
+import android.location.Geocoder
+import android.location.Geocoder.GeocodeListener
+import android.location.Location
 import android.os.Build
+import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import org.w3c.dom.Text
+import java.io.IOException
+import java.util.*
 
 
 class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnItemSelectedListener {
@@ -24,6 +37,14 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
     private var sexOptions : Array<String> = arrayOf("Prefer not to say", "Female", "Male")
     private var activityLevelOptions : Array<String> = arrayOf("Sedentary", "Lightly active", "Moderately active", "Active", "Very active")
 
+    private var cityInput : EditText? = null
+
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private var gcListener : GCListener = GCListener()
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -36,12 +57,95 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         mButtonCamera!!.setOnClickListener(this)
         mButtonSubmit!!.setOnClickListener(this)
 
+        cityInput = findViewById(R.id.cityInput)
+
         setSpinnerDataString(R.id.countryInput, countryOptions)
         setSpinnerDataInt(R.id.heightFeetInput, heightFeetOptions)
         setSpinnerDataInt(R.id.heightInchesInput, heightInchesOptions)
         setSpinnerDataString(R.id.sexInput, sexOptions)
         setSpinnerDataString(R.id.activityLevelInput, activityLevelOptions)
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+        fusedLocationClient.lastLocation
+            .addOnSuccessListener { location : Location? ->
+                // Got last known location. In some rare situations this can be null.
+                val latLongText = findViewById<TextView>(R.id.latLong)
+                latLongText.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
+                if (location != null) {
+                    getLocationName(location.latitude, location.longitude)
+                }
+            }
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                1
+            )
+            return
+        }
+
+
+        val locationPermissionRequest = registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { permissions ->
+            when {
+                permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
+                    // Precise location access granted.
+                }
+                permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                    // Only approximate location access granted.
+                } else -> {
+                // No location access granted.
+            }
+            }
+        }
+
+        locationPermissionRequest.launch(arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION))
+    }
+
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>,
+                                            grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == 1) {
+            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this@MainActivity, "Location Permission Granted", Toast.LENGTH_SHORT)
+                    .show()
+
+
+            } else {
+                Toast.makeText(this@MainActivity, "Location Permission Denied", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    fun getLocationName(latitude: Double, longitude: Double): String? {
+        var cityName = "Not Found"
+        val gcd = Geocoder(this, Locale.getDefault())
+        try {
+            gcd.getFromLocation(
+                latitude, longitude,
+                10,
+                gcListener
+            )
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return cityName
     }
 
     private fun setSpinnerDataString(spinnerId: Int, spinnerOptions: Array<String>) {
@@ -96,7 +200,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
 
                 val heightFeetSpinner : Spinner? = findViewById(R.id.heightFeetInput)
                 val heightFeetValue : Int = Integer.parseInt(heightFeetSpinner!!.selectedItem.toString())
-                val heightInchesSpinner : Spinner? = findViewById(R.id.heightFeetInput)
+                val heightInchesSpinner : Spinner? = findViewById(R.id.heightInchesInput)
                 val heightInchesValue : Int = Integer.parseInt(heightInchesSpinner!!.selectedItem.toString())
 
                 val weightTextEdit : EditText? = findViewById(R.id.weightInput)
@@ -148,5 +252,32 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    inner class GCListener : GeocodeListener {
+
+        override fun onGeocode(addresses: List<Address>) {
+            // do something with the location
+            var cityName: String = "Not found"
+            if (addresses != null) {
+                for (adrs in addresses) {
+                    if (adrs != null) {
+                        val city: String = adrs.getLocality()
+                        if (city != null && city != "") {
+                            cityName = city
+                            println("city ::  $cityName")
+                        } else {
+                        }
+                        // // you should also try with addresses.get(0).toSring();
+                    }
+                }
+            }
+            cityInput?.setText(cityName)
+        }
+
+        override fun onError(errorMessage: String?) {
+            super.onError(errorMessage)
+        }
+    }
 
 }
