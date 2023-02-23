@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WeatherDisplayActivity"
+    android:padding="16dp"
+    android:orientation="vertical"
+    >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:text="Weather in Hell"
+            android:id="@+id/location_value"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:layout_centerHorizontal="true"
+            style="@style/Title.Small"/>
+        <TextView
+            android:id="@+id/bmr_score"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_below="@id/location_value"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/weather_square"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="10,000 degrees"
+            android:textColor="#000000"
+            android:textSize="14sp" />
+    </RelativeLayout>
+</LinearLayout>

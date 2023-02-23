@@ -200,6 +200,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
                 messageIntent.putExtra("ACTIVITY_LEVEL", activityLevelValue)
                 this.startActivity(messageIntent)
             }
+            R.id.action_weather -> {
+                cityValue = cityTextEdit!!.text.toString()
+                countryValue = countrySpinner!!.selectedItem.toString()
+
+                //Start an activity and pass the data to it.
+                val messageIntent = Intent(this, WeatherDisplayActivity::class.java)
+                messageIntent.putExtra("LOCATION", "$cityValue, $countryValue")
+                this.startActivity(messageIntent)
+            }
         }
     }
 
@@ -294,6 +303,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         }
         return true
     }
+
+    //override fun NavigationItemSelectedListener()
 }
 
 
