@@ -200,7 +200,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
                 messageIntent.putExtra("ACTIVITY_LEVEL", activityLevelValue)
                 this.startActivity(messageIntent)
             }
-            R.id.action_weather -> {
+            //this doesn't do anything, not sure how to make it go to the weather page from the button
+            //on the navbar...
+            /*R.id.action_weather -> {
                 cityValue = cityTextEdit!!.text.toString()
                 countryValue = countrySpinner!!.selectedItem.toString()
 
@@ -208,7 +210,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
                 val messageIntent = Intent(this, WeatherDisplayActivity::class.java)
                 messageIntent.putExtra("LOCATION", "$cityValue, $countryValue")
                 this.startActivity(messageIntent)
-            }
+            }*/
         }
     }
 

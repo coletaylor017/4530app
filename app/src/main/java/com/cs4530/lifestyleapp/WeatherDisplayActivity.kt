@@ -12,6 +12,10 @@ import java.io.File
 class WeatherDisplayActivity : AppCompatActivity() {
 
     private var locationReceived : String? = null
+    private var temperatureReceived : String? = null
+    private var highReceived : String? = null
+    private var lowReceived : String? = null
+    private var weatherReceived : String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +29,5 @@ class WeatherDisplayActivity : AppCompatActivity() {
 
         // Display received data in text views
         findViewById<TextView>(R.id.location_value)!!.text = getString(R.string.weather_header, locationReceived!!.toString())
-
     }
 }
