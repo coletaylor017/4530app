@@ -1,12 +1,17 @@
 package com.cs4530.lifestyleapp
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.TextView
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
 import android.widget.ImageView
+import android.widget.Toast
 import java.io.File
 
 class ProfileDisplayActivity : AppCompatActivity() {
@@ -62,6 +67,22 @@ class ProfileDisplayActivity : AppCompatActivity() {
         if(bits != null) {
             mIvPic = findViewById<View>(R.id.profile_pic) as ImageView
             mIvPic!!.setImageBitmap(bits)
+        }
+
+        /** The next lines create listener for the Find Hike button **/
+        val hikeButton = findViewById<Button>(R.id.find_hike)
+        hikeButton.setOnClickListener {
+            //TODO: Update based on user location
+            val locationOfUser: String = "40.000, -111.000" //Temporary
+            val searchUri = Uri.parse("geo:"+locationOfUser+"?q=hikes near me")
+            //create map intent
+            val mapIntent = Intent(Intent.ACTION_VIEW, searchUri)
+
+            try{
+                startActivity(mapIntent)
+            }catch(ex: ActivityNotFoundException) {
+                Toast.makeText(this, "Map Not Available", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
