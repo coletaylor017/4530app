@@ -1,5 +1,6 @@
 package com.cs4530.lifestyleapp
 
+import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.graphics.Bitmap
@@ -12,6 +13,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.gms.location.LocationCallback
 import java.io.File
 
 class ProfileDisplayActivity : AppCompatActivity() {
@@ -25,6 +28,21 @@ class ProfileDisplayActivity : AppCompatActivity() {
     private var activityLevelReceived : String? = null
     private var bmrScore: TextView? = null
     private var mIvPic: ImageView? = null
+
+    //Checks permission granted from user https://developer.android.com/training/location/permissions
+    val locationPermissionRequest = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        when {
+            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
+                // approximate location access granted.
+            } else -> {
+            // No location access granted.
+            }
+        }
+    }
+    //Enables location update https://developer.android.com/training/location/request-updates
+    private lateinit var locationCallback: LocationCallback
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,29 +80,31 @@ class ProfileDisplayActivity : AppCompatActivity() {
             bmrScore!!.text = bmr.toString()
         }
 
-        /** The next few lines retrieve the photo from cache and redraw them **/
+        /** The next block retrieve the photo from cache and redraw them **/
         var bits : Bitmap? = getBitmapFromCache()
         if(bits != null) {
             mIvPic = findViewById<View>(R.id.profile_pic) as ImageView
             mIvPic!!.setImageBitmap(bits)
         }
 
-        /** The next lines create listener for the Find Hike button **/
+        //TODO: Looks at last location. Get fresh location update before accessing location
+        /** The next block create listener for the Find Hike button **/
+        locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)) //Before performing location permission request, check if app has permission.
+
         val hikeButton = findViewById<Button>(R.id.find_hike)
         hikeButton.setOnClickListener {
-            //TODO: Update based on user location
-            val locationOfUser: String = "40.000, -111.000" //Temporary
-            val searchUri = Uri.parse("geo:"+locationOfUser+"?q=hikes near me")
+            val searchUri = Uri.parse("geo:?q=hikes near me") //Instead of getting location in search, utilized maps' automatic search from location
             //create map intent
             val mapIntent = Intent(Intent.ACTION_VIEW, searchUri)
-
             try{
                 startActivity(mapIntent)
             }catch(ex: ActivityNotFoundException) {
                 Toast.makeText(this, "Map Not Available", Toast.LENGTH_SHORT).show()
             }
         }
+
     }
+
 
     /* BMR calculation:
     * For men: 66.47 + (6.24 × weight in pounds) + (12.7 × height in inches) − (6.75 × age in years).

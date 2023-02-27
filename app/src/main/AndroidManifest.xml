@@ -4,6 +4,9 @@
     <!-- Camera added to manifest, permissions true for all devices added -->
     <uses-feature android:name="android.hardware.camera" android:required="true" />
 
+    <!-- Location request https://developer.android.com/training/permissions/requesting#already-granted -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -28,6 +31,13 @@
                 android:value=".MainActivity"
                 />
         </activity>
+        <!-- Not 100% on the name here https://developer.android.com/training/location/permissions-->
+        <service
+            android:foregroundServiceType="location"
+            android:name="com.cs4530.lifestyleapp.ProfileDisplayActivity"
+            />
+        <!-- As a note this service seemed to be the key to getting the code working -->
+
     </application>
 
 </manifest>
