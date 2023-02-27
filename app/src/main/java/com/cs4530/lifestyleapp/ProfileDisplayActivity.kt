@@ -1,10 +1,16 @@
 package com.cs4530.lifestyleapp
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.location.Location
+import android.location.LocationListener
+import android.location.LocationManager
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.TextView
@@ -14,8 +20,10 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.LocationCallback
 import java.io.File
+
 
 class ProfileDisplayActivity : AppCompatActivity() {
 
@@ -28,21 +36,7 @@ class ProfileDisplayActivity : AppCompatActivity() {
     private var activityLevelReceived : String? = null
     private var bmrScore: TextView? = null
     private var mIvPic: ImageView? = null
-
-    //Checks permission granted from user https://developer.android.com/training/location/permissions
-    val locationPermissionRequest = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { permissions ->
-        when {
-            permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                // approximate location access granted.
-            } else -> {
-            // No location access granted.
-            }
-        }
-    }
-    //Enables location update https://developer.android.com/training/location/request-updates
-    private lateinit var locationCallback: LocationCallback
+    private var locationString: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +44,38 @@ class ProfileDisplayActivity : AppCompatActivity() {
 
         //Get the intent that created this activity.
         val receivedIntent = intent
+
+        // Initialize the location manager. This will get an update on the users location while onCreate is running.
+        val locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        // Initialize the location listener. This is designed to get an updated location once and stop.
+        val locationListener = object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                locationString = location.latitude.toString() + ", " + location.longitude.toString()
+                //This ends the requestLocationUpdates. Though initial tests didn't show much degredation in peformance. Best practice to removeUpdates though.
+                locationManager.removeUpdates(this)
+            }
+            override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
+                // Handle status changes
+                var yes : String? = null
+            }
+            override fun onProviderEnabled(provider: String) {
+                // Handle provider enabled
+                var yes : String? = null
+            }
+            override fun onProviderDisabled(provider: String) {
+                // Handle provider disabled
+                var yes : String? = null
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Toast.makeText(this, "No location permission. Hikes not accurate.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener) //Suppressed MissingPermission for this
+
 
         //Get the string data
         nameReceived = receivedIntent.getStringExtra("NAME")
@@ -87,13 +113,10 @@ class ProfileDisplayActivity : AppCompatActivity() {
             mIvPic!!.setImageBitmap(bits)
         }
 
-        //TODO: Looks at last location. Get fresh location update before accessing location
-        /** The next block create listener for the Find Hike button **/
-        locationPermissionRequest.launch(arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION)) //Before performing location permission request, check if app has permission.
-
+        /** The next block listens for find hike button and opens the map**/
         val hikeButton = findViewById<Button>(R.id.find_hike)
         hikeButton.setOnClickListener {
-            val searchUri = Uri.parse("geo:?q=hikes near me") //Instead of getting location in search, utilized maps' automatic search from location
+            val searchUri = Uri.parse("geo:" + locationString + "?q=hikes near me") //Instead of getting location in search, utilized maps' automatic search from location
             //create map intent
             val mapIntent = Intent(Intent.ACTION_VIEW, searchUri)
             try{
@@ -102,7 +125,6 @@ class ProfileDisplayActivity : AppCompatActivity() {
                 Toast.makeText(this, "Map Not Available", Toast.LENGTH_SHORT).show()
             }
         }
-
     }
 
 
