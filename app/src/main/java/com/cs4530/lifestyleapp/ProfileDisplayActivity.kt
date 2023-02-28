@@ -68,13 +68,6 @@ class ProfileDisplayActivity : AppCompatActivity() {
             }
         }
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-        ) {
-            Toast.makeText(this, "No location permission. Hikes not accurate.", Toast.LENGTH_SHORT).show()
-            return
-        }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener) //Suppressed MissingPermission for this
 
 
         //Get the string data
@@ -113,16 +106,31 @@ class ProfileDisplayActivity : AppCompatActivity() {
             mIvPic!!.setImageBitmap(bits)
         }
 
-        /** The next block listens for find hike button and opens the map**/
-        val hikeButton = findViewById<Button>(R.id.find_hike)
-        hikeButton.setOnClickListener {
-            val searchUri = Uri.parse("geo:" + locationString + "?q=hikes near me") //Instead of getting location in search, utilized maps' automatic search from location
-            //create map intent
-            val mapIntent = Intent(Intent.ACTION_VIEW, searchUri)
-            try{
-                startActivity(mapIntent)
-            }catch(ex: ActivityNotFoundException) {
-                Toast.makeText(this, "Map Not Available", Toast.LENGTH_SHORT).show()
+        /** This block prevents hike button from being active if location is disabled. Otherwise implements **/
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            Toast.makeText(this, "No location permission. Hikes not accurate.", Toast.LENGTH_SHORT).show()
+            val hikeButtonDisabled = findViewById<Button>(R.id.find_hike)
+            hikeButtonDisabled.setOnClickListener {
+                Toast.makeText(this, "Enable location permission to find hikes", Toast.LENGTH_SHORT).show()
+                hikeButtonDisabled.isEnabled = false
+            }
+        }
+        else
+        {
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener) //Suppressed MissingPermission for this
+
+            /** The next block listens for find hike button and opens the map**/
+            val hikeButton = findViewById<Button>(R.id.find_hike)
+            hikeButton.setOnClickListener {
+                val searchUri = Uri.parse("geo:" + locationString + "?q=hikes near me") //Instead of getting location in search, utilized maps' automatic search from location
+                //create map intent
+                val mapIntent = Intent(Intent.ACTION_VIEW, searchUri)
+                try{
+                    startActivity(mapIntent)
+                }catch(ex: ActivityNotFoundException) {
+                    Toast.makeText(this, "Map Not Available", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
