@@ -247,8 +247,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
 
     override fun onItemSelected(parent: AdapterView<*>?,
                                 view: View, position: Int,
-                                id: Long) {
-            // access selected country using countries[position]
+                                id: Long)
+
+    override fun onNothingSelected(p0: AdapterView<*>?) {
+        TODO("Not yet implemented")
+    }
+    // access selected country using countries[position]
+    
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {}
