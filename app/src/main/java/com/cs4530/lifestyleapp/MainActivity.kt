@@ -2,13 +2,12 @@ package com.cs4530.lifestyleapp
 
 import android.Manifest
 import android.content.ActivityNotFoundException
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.location.Address
-import android.location.Geocoder
+import android.location.*
 import android.location.Geocoder.GeocodeListener
-import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -32,13 +31,16 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
     private var mButtonLocation: Button? = null
     private var mIvPic: ImageView? = null
 
-    private var countryOptions : Array<String> = arrayOf("United States", "Canada", "Ethiopia")
+    private var countryOptions : Array<String> = arrayOf("United States", "Canada", "Ethiopia", "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "The Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo, Republic of the", "Congo, Democratic Republic of the", "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "East Timor (Timor-Leste)", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "The Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia, Federated States of", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar (Burma)", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Norway", "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States of America", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City (Holy See)", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe")
     private var heightFeetOptions : Array<Int> = arrayOf(1, 2, 3, 4, 5, 6, 7, 8)
-    private var heightInchesOptions : Array<Int> = arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
+    private var heightInchesOptions : Array<Int> = arrayOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
     private var sexOptions : Array<String> = arrayOf("Prefer not to say", "Female", "Male")
     private var activityLevelOptions : Array<String> = arrayOf("Sedentary", "Lightly active", "Moderately active", "Active", "Very active")
 
     private var cityInput : EditText? = null
+
+    private var latitude: Double? = null
+    private var longitude: Double? = null
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
@@ -70,6 +72,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         setSpinnerDataString(R.id.sexInput, sexOptions)
         setSpinnerDataString(R.id.activityLevelInput, activityLevelOptions)
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
         requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted : Boolean ->
@@ -79,6 +83,35 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
                 Toast.makeText(this@MainActivity, "Location Permission Denied", Toast.LENGTH_SHORT).show();
             }
         }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            Toast.makeText(this, "No location permission. Hikes not accurate.", Toast.LENGTH_SHORT).show()
+        }
+
+        val locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationListener = object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                latitude = location.latitude
+                longitude = location.longitude
+                val latLongText = findViewById<TextView>(R.id.latLong)
+                latLongText.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
+                locationManager.removeUpdates(this)
+            }
+            override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
+                // Handle status changes
+                var yes : String? = null
+            }
+            override fun onProviderEnabled(provider: String) {
+                // Handle provider enabled
+                var yes : String? = null
+            }
+            override fun onProviderDisabled(provider: String) {
+                // Handle provider disabled
+                var yes : String? = null
+            }
+        }
+
 
 
     }
@@ -147,6 +180,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         when (view.id) { //Added ? due to warning message. Consider better checks.
             R.id.LocationButton -> {
 
+
+
                 if (
                     ActivityCompat.checkSelfPermission(
                         this, Manifest.permission.ACCESS_COARSE_LOCATION
@@ -157,13 +192,24 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
                 ) {
                     // You can use the API that requires the permission.
                     Toast.makeText(this@MainActivity, "Location permission already granted", Toast.LENGTH_SHORT).show();
+
+
+                    fusedLocationClient.lastLocation
+                        .addOnSuccessListener { location : Location? ->
+                            // Got last known location. In some rare situations this can be null.
+                            val latLongText = findViewById<TextView>(R.id.latLong)
+                            latLongText.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
+                            if (location != null) {
+                                getLocationName(location.latitude, location.longitude)
+                            }
+                        }
                 }
                 else {
                     // You can directly ask for the permission.
                     // The registered ActivityResultCallback gets the result of this request.
                     Toast.makeText(this@MainActivity, "Asking permission", Toast.LENGTH_SHORT).show();
                     requestPermissionLauncher.launch(
-                        Manifest.permission.ACCESS_FINE_LOCATION
+                        Manifest.permission.ACCESS_COARSE_LOCATION
 
                     )
                 }
