@@ -14,13 +14,13 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import org.w3c.dom.Text
 import java.io.IOException
 import java.util.*
 
@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
     // Variables for UI elements
     private var mButtonCamera: Button? = null
     private var mButtonSubmit: Button? = null
+    private var mButtonLocation: Button? = null
     private var mIvPic: ImageView? = null
 
     private var countryOptions : Array<String> = arrayOf("United States", "Canada", "Ethiopia")
@@ -41,6 +42,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
+    private lateinit var requestPermissionLauncher : ActivityResultLauncher<String>
+
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private var gcListener : GCListener = GCListener()
 
@@ -52,10 +55,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         //Get the buttons
         mButtonCamera = findViewById(R.id.PhotoButton)
         mButtonSubmit = findViewById(R.id.button_submit)
+        mButtonLocation = findViewById(R.id.LocationButton)
 
         //Say that this class itself contains the listener
         mButtonCamera!!.setOnClickListener(this)
         mButtonSubmit!!.setOnClickListener(this)
+        mButtonLocation!!.setOnClickListener(this)
 
         cityInput = findViewById(R.id.cityInput)
 
@@ -65,72 +70,36 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         setSpinnerDataString(R.id.sexInput, sexOptions)
         setSpinnerDataString(R.id.activityLevelInput, activityLevelOptions)
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-        fusedLocationClient.lastLocation
-            .addOnSuccessListener { location : Location? ->
-                // Got last known location. In some rare situations this can be null.
-                val latLongText = findViewById<TextView>(R.id.latLong)
-                latLongText.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
-                if (location != null) {
-                    getLocationName(location.latitude, location.longitude)
-                }
-            }
-
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                1
-            )
-            return
-        }
-
-
-        val locationPermissionRequest = registerForActivityResult(
-            ActivityResultContracts.RequestMultiplePermissions()
-        ) { permissions ->
-            when {
-                permissions.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                    // Precise location access granted.
-                }
-                permissions.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                    // Only approximate location access granted.
-                } else -> {
-                // No location access granted.
-            }
-            }
-        }
-
-        locationPermissionRequest.launch(arrayOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION))
-    }
-
-
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>,
-                                            grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 1) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this@MainActivity, "Location Permission Granted", Toast.LENGTH_SHORT)
-                    .show()
-
-
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted : Boolean ->
+            if (isGranted) {
+                Toast.makeText(this@MainActivity, "Location Permission Granted", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this@MainActivity, "Location Permission Denied", Toast.LENGTH_SHORT)
-                    .show()
+                Toast.makeText(this@MainActivity, "Location Permission Denied", Toast.LENGTH_SHORT).show();
             }
         }
+
+
     }
+
+
+//    override fun onRequestPermissionsResult(requestCode: Int,
+//                                            permissions: Array<String>,
+//                                            grantResults: IntArray) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        if (requestCode == 1) {
+//            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                Toast.makeText(this@MainActivity, "Location Permission Granted", Toast.LENGTH_SHORT)
+//                    .show()
+//
+//
+//            } else {
+//                Toast.makeText(this@MainActivity, "Location Permission Denied", Toast.LENGTH_SHORT)
+//                    .show()
+//            }
+//        }
+//    }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun getLocationName(latitude: Double, longitude: Double): String? {
@@ -173,8 +142,33 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         targetSpinner.adapter = targetSpinnerAdapter
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onClick(view: View) {
         when (view.id) { //Added ? due to warning message. Consider better checks.
+            R.id.LocationButton -> {
+
+                if (
+                    ActivityCompat.checkSelfPermission(
+                        this, Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                    || ActivityCompat.checkSelfPermission(
+                        this, Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    // You can use the API that requires the permission.
+                    Toast.makeText(this@MainActivity, "Location permission already granted", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    // You can directly ask for the permission.
+                    // The registered ActivityResultCallback gets the result of this request.
+                    Toast.makeText(this@MainActivity, "Asking permission", Toast.LENGTH_SHORT).show();
+                    requestPermissionLauncher.launch(
+                        Manifest.permission.ACCESS_FINE_LOCATION
+
+                    )
+                }
+            }
+
             R.id.PhotoButton -> {
                 //The button press should open a camera
                 val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -247,17 +241,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
 
     override fun onItemSelected(parent: AdapterView<*>?,
                                 view: View, position: Int,
-                                id: Long)
+                                id: Long) {
+
+    }
 
     override fun onNothingSelected(p0: AdapterView<*>?) {
         TODO("Not yet implemented")
     }
     // access selected country using countries[position]
     
-    }
-
-    override fun onNothingSelected(parent: AdapterView<*>?) {}
-
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     inner class GCListener : GeocodeListener {
 
@@ -267,13 +259,13 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
             if (addresses != null) {
                 for (adrs in addresses) {
                     if (adrs != null) {
-                        val city: String = adrs.getLocality()
+                        val city: String = adrs.locality
                         if (city != null && city != "") {
                             cityName = city
                             println("city ::  $cityName")
                         } else {
                         }
-                        // // you should also try with addresses.get(0).toSring();
+                        // you should also try with addresses.get(0).toSring();
                     }
                 }
             }
