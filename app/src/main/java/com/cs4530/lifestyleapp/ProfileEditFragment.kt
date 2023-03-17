@@ -24,6 +24,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.location.*
 import android.location.Geocoder.GeocodeListener
+import android.text.TextUtils
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -433,6 +434,12 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
                 }
             }
             R.id.submitButton -> {
+                if(TextUtils.isEmpty(heightFeetSpinner!!.selectedItem.toString()) ||
+                    TextUtils.isEmpty(heightInchesSpinner!!.selectedItem.toString())) {
+                    Toast.makeText(requireContext(), "Height cannot be empty", Toast.LENGTH_SHORT).show();
+                    return
+                }
+
                 firstNameValue = firstNameTextEdit!!.text.toString()
                 lastNameValue = lastNameTextEdit!!.text.toString()
                 ageValue = ageSlider!!.value.toInt().toString()
