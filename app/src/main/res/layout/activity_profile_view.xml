@@ -15,6 +15,13 @@
         android:stretchColumns="0,1"
         android:layout_marginBottom="15dp"
         >
+        <!-- Feel free to move this from the linear layout. -->
+        <!-- Assignment says top right. -->
+        <ImageView
+            android:id="@+id/profile_pic"
+            android:layout_width="fill_parent"
+            android:layout_height="171dp"
+            tools:srcCompat="@tools:sample/avatars" />
         <TableRow>
             <TextView
                 android:text="@string/name_label"
@@ -112,13 +119,6 @@
             android:textSize="14sp" />
     </RelativeLayout>
 
-    <!-- Feel free to move this from the linear layout. -->
-    <!-- Assignment says top right. -->
-    <ImageView
-        android:id="@+id/profile_pic"
-        android:layout_width="fill_parent"
-        android:layout_height="171dp"
-        tools:srcCompat="@tools:sample/avatars" />
 
     <Button
         android:id="@+id/find_hike"
