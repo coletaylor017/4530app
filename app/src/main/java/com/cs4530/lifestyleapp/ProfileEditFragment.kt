@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -19,6 +20,16 @@ import com.google.android.material.slider.Slider
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.ClassCastException
+import android.Manifest
+import android.content.pm.PackageManager
+import android.location.*
+import android.location.Geocoder.GeocodeListener
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import java.io.IOException
+import java.util.*
 
 class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemSelectedListener {
     // Variables to hold values of UI elements
@@ -33,6 +44,8 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
     private var sexValue: String? = null
     private var activityLevelValue: String? = null
     private var bmrValue: String? = null
+    private var latitude: Double? = null
+    private var longitude: Double? = null
 
     // Variables for UI elements
     private var firstNameTextEdit: EditText? = null
@@ -45,16 +58,21 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
     private var weightSlider: Slider? = null
     private var sexSpinner: Spinner? = null
     private var activityLevelSpinner: Spinner? = null
+    private var cityInput : EditText? = null
+    private var latLongText: TextView? = null
+
     private var mButtonCamera: Button? = null
     private var mButtonSubmit: Button? = null
+    private var mButtonLocation: Button? = null
     private var mIvPic: ImageView? = null
 
-    private var countryOptions: Array<String> = arrayOf("United States", "Canada", "Ethiopia")
+    private var countryOptions : Array<String> = arrayOf("United States", "Canada", "Ethiopia", "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan", "The Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo, Republic of the", "Congo, Democratic Republic of the", "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "East Timor (Timor-Leste)", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Fiji", "Finland", "France", "Gabon", "The Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea, North", "Korea, South", "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia, Federated States of", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar (Burma)", "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Norway", "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda", "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "Uruguay", "Uzbekistan", "Vanuatu", "Vatican City (Holy See)", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe")
     private var heightFeetOptions: Array<String> = arrayOf("1", "2", "3", "4", "5", "6", "7", "8")
-    private var heightInchesOptions: Array<String> = arrayOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11")
+    private var heightInchesOptions: Array<String> = arrayOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11")
     private var sexOptions: Array<String> = arrayOf("Prefer not to say", "Female", "Male")
     private var activityLevelOptions: Array<String> =
         arrayOf("Sedentary", "Lightly active", "Moderately active", "Active", "Very active")
+    private var activityFactors: Map<String, Double> = mapOf("Sedentary" to 1.2, "Lightly active" to 1.375, "Moderately active" to 1.55, "Active" to 1.725, "Very active" to 1.9)
 
     private var countryAdapter: ArrayAdapter<String?>? = null
     private var feetAdapter: ArrayAdapter<String?>? = null
@@ -62,7 +80,13 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
     private var sexAdapter: ArrayAdapter<String?>? = null
     private var activityAdapter: ArrayAdapter<String?>? = null
 
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var requestPermissionLauncher : ActivityResultLauncher<String>
+
     var dataPasser: ProfileEditDataPassingInterface? = null
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private var gcListener : ProfileEditFragment.GCListener = GCListener()
 
     interface ProfileEditDataPassingInterface {
         fun passProfileData(data: Array<String?>?)
@@ -77,12 +101,14 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_profile_edit, container, false)
+
         // Get the form fields
         firstNameTextEdit = view.findViewById(R.id.firstNameInput)
         lastNameTextEdit = view.findViewById(R.id.lastNameInput)
@@ -90,18 +116,24 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
         cityTextEdit = view.findViewById(R.id.cityInput)
         countrySpinner = view.findViewById(R.id.countryInput)
         heightFeetSpinner = view.findViewById(R.id.heightFeetInput)
-        heightInchesSpinner = view.findViewById(R.id.heightFeetInput)
+        heightInchesSpinner = view.findViewById(R.id.heightInchesInput)
         weightSlider = view.findViewById(R.id.weightInput)
         sexSpinner = view.findViewById(R.id.sexInput)
         activityLevelSpinner = view.findViewById(R.id.activityLevelInput)
+        latLongText = view.findViewById(R.id.latLong)
 
         //Get the buttons
-        mButtonCamera = view.findViewById(R.id.button_upload_photo)
-        mButtonSubmit = view.findViewById(R.id.button_submit)
+        mButtonCamera = view.findViewById(R.id.uploadPhotoButton)
+        mButtonSubmit = view.findViewById(R.id.submitButton)
+        mButtonLocation = view.findViewById(R.id.locationButton)
 
         //Say that this class itself contains the listener
         mButtonCamera!!.setOnClickListener(this)
         mButtonSubmit!!.setOnClickListener(this)
+        mButtonLocation!!.setOnClickListener(this)
+
+        // TODO: this is a duplicate
+        cityInput = view.findViewById(R.id.cityInput)
 
         // Define remaining values
         countryAdapter = setSpinnerData(R.id.countryInput, countryOptions, view)
@@ -112,6 +144,29 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
 
         mIvPic = view.findViewById(R.id.iv_pic)
 
+        /** Retrieve all the field values for data persistence on rotate **/
+        if (savedInstanceState != null) {
+            firstNameTextEdit!!.setText(savedInstanceState.getString("FIRST_NAME"))
+            lastNameTextEdit!!.setText(savedInstanceState.getString("LAST_NAME"))
+            ageSlider!!.value = savedInstanceState.getString("AGE")!!.toFloat()
+            cityTextEdit!!.setText(savedInstanceState.getString("CITY"))
+            val countryPosition =
+                countryAdapter!!.getPosition(savedInstanceState.getString("COUNTRY"))
+            countrySpinner!!.setSelection(countryPosition)
+            val feetPosition =
+                feetAdapter!!.getPosition(savedInstanceState.getString("HEIGHT_FEET"))
+            heightFeetSpinner!!.setSelection(feetPosition)
+            val inchesPosition =
+                inchesAdapter!!.getPosition(savedInstanceState.getString("HEIGHT_INCHES"))
+            heightInchesSpinner!!.setSelection(inchesPosition)
+            weightSlider!!.value = savedInstanceState.getString("WEIGHT")!!.toFloat()
+            val sexPosition = sexAdapter!!.getPosition(savedInstanceState.getString("SEX"))
+            sexSpinner!!.setSelection(sexPosition)
+            val activityPosition =
+                activityAdapter!!.getPosition(savedInstanceState.getString("ACTIVITY_LEVEL"))
+            activityLevelSpinner!!.setSelection(activityPosition)
+        }
+
         /** The next few lines retrieve the photo from cache and redraw them **/
         var bits: Bitmap? = getBitmapFromCache()
         if (bits != null) {
@@ -119,7 +174,105 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
             mIvPic!!.setImageBitmap(bits)
         }
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
+        requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted : Boolean ->
+            if (isGranted) {
+                Toast.makeText(requireContext(), "Location Permission Granted", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(requireContext(), "Location Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+        {
+            Toast.makeText(requireContext(), "No location permission. Hikes not accurate.", Toast.LENGTH_SHORT).show()
+        }
+
+        val locationManager: LocationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val locationListener = object : LocationListener {
+            override fun onLocationChanged(location: Location) {
+                latitude = location.latitude
+                longitude = location.longitude
+                latLongText!!.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
+                locationManager.removeUpdates(this)
+            }
+            override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
+                // Handle status changes
+                var yes : String? = null
+            }
+            override fun onProviderEnabled(provider: String) {
+                // Handle provider enabled
+                var yes : String? = null
+            }
+            override fun onProviderDisabled(provider: String) {
+                // Handle provider disabled
+                var yes : String? = null
+            }
+        }
         return view
+    }
+
+    //    override fun onRequestPermissionsResult(requestCode: Int,
+//                                            permissions: Array<String>,
+//                                            grantResults: IntArray) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        if (requestCode == 1) {
+//            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                Toast.makeText(this@MainActivity, "Location Permission Granted", Toast.LENGTH_SHORT)
+//                    .show()
+//
+//
+//            } else {
+//                Toast.makeText(this@MainActivity, "Location Permission Denied", Toast.LENGTH_SHORT)
+//                    .show()
+//            }
+//        }
+//    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    fun getLocationName(latitude: Double, longitude: Double): String? {
+        var cityName = "Not Found"
+        val gcd = Geocoder(requireContext(), Locale.getDefault())
+        try {
+            gcd.getFromLocation(
+                latitude, longitude,
+                10,
+                gcListener
+            )
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return cityName
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+
+        super.onSaveInstanceState(outState)
+
+        firstNameValue = firstNameTextEdit!!.text.toString()
+        lastNameValue = lastNameTextEdit!!.text.toString()
+        val age = ageSlider!!.value.toString()
+        cityValue = cityTextEdit!!.text.toString()
+        countryValue = countrySpinner!!.selectedItem.toString()
+        val heightFeet = heightFeetSpinner!!.selectedItem.toString()
+        val heightInches = heightInchesSpinner!!.selectedItem.toString()
+        val weight = weightSlider!!.value.toString()
+        sexValue = sexSpinner!!.selectedItem.toString()
+        activityLevelValue = activityLevelSpinner!!.selectedItem.toString()
+
+        outState.putString("FIRST_NAME", firstNameValue)
+        outState.putString("LAST_NAME", lastNameValue)
+        outState.putString("AGE", age)
+        outState.putString("COUNTRY", countryValue)
+        outState.putString("CITY", cityValue)
+        outState.putString("HEIGHT_FEET", heightFeet)
+        outState.putString("HEIGHT_INCHES", heightInches)
+        outState.putString("WEIGHT", weight)
+        outState.putString("SEX", sexValue)
+        outState.putString("ACTIVITY_LEVEL", activityLevelValue)
     }
 
     private fun setSpinnerData(
@@ -130,7 +283,6 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
         val targetSpinner = view.findViewById<Spinner>(spinnerId)
         targetSpinner.onItemSelectedListener =
             this // onItemSelectedListener tells you which item was clicked
-        // TODO: need to do something with activity because it's in a frag here
         val targetSpinnerAdapter: ArrayAdapter<String?> = ArrayAdapter<String?>(
             requireContext(),
             android.R.layout.simple_spinner_item,
@@ -212,30 +364,62 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
 
     /* BMR calculation:
     * For men: 66.47 + (6.24 × weight in pounds) + (12.7 × height in inches) − (6.75 × age in years).
-    * For women: BMR = 65.51 + (4.35 × weight in pounds) + (4.7 × height in inches) - (4.7 × age in years) */
+    * For women: BMR = 655.51 + (4.35 × weight in pounds) + (4.7 × height in inches) - (4.7 × age in years) */
     private fun calculateBMR(feet: String?, inches:String?, weight: String?, sex:String?, age:String?, activity:String?): Int {
         if (feet.isNullOrBlank() || inches.isNullOrBlank() || weight.isNullOrBlank() || sex.isNullOrBlank()
             || age.isNullOrBlank() || activity.isNullOrBlank()) {
             return 0
 
         }
-        // TODO: have to factor in activity level
         val weightInt = weight.toInt()
         val ageInt = age.toInt()
         val heightInInches = feet.toInt() * 12 + inches.toInt()
 
+        val activityFactor = if (activityFactors.containsKey(activity) && activityFactors[activity]!! > 0) activityFactors!![activity] else 1.1
+
         if (sex == "Female") {
-            return (65.51 + (4.35 * weightInt) + (4.7 * heightInInches) - (4.7 * ageInt)).toInt()
+            return ((655.0 + (4.35 * weightInt) + (4.7 * heightInInches) - (4.7 * ageInt)) * activityFactor!!).toInt()
         }
         if (sex == "Male") {
-            return (66.47 + (6.24 * weightInt) + (12.7 * heightInInches) - (6.75 * ageInt)).toInt()
+            return ((66.0 + (6.23 * weightInt) + (12.7 * heightInInches) - (6.8 * ageInt))* activityFactor!!).toInt()
         }
         return 0
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onClick(view: View) {
         when (view?.id) { //Added ? due to warning message. Consider better checks.
-            R.id.button_upload_photo -> {
+            R.id.LocationButton -> {
+                if (
+                    ActivityCompat.checkSelfPermission(
+                        requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                    || ActivityCompat.checkSelfPermission(
+                        requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
+                ) {
+                    // You can use the API that requires the permission.
+                    Toast.makeText(requireContext(), "Location permission already granted", Toast.LENGTH_SHORT).show()
+
+                    fusedLocationClient.lastLocation
+                        .addOnSuccessListener { location : Location? ->
+                            // Got last known location. In some rare situations this can be null.
+                            latLongText!!.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
+                            if (location != null) {
+                                getLocationName(location.latitude, location.longitude)
+                            }
+                        }
+                }
+                else {
+                    // You can directly ask for the permission.
+                    // The registered ActivityResultCallback gets the result of this request.
+                    Toast.makeText(requireContext(), "Asking permission", Toast.LENGTH_SHORT).show();
+                    requestPermissionLauncher.launch(
+                        Manifest.permission.ACCESS_COARSE_LOCATION
+                    )
+                }
+            }
+            R.id.uploadPhotoButton -> {
                 //The button press should open a camera
                 val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 try {
@@ -248,7 +432,7 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
                     toast.show()
                 }
             }
-            R.id.button_submit -> {
+            R.id.submitButton -> {
                 firstNameValue = firstNameTextEdit!!.text.toString()
                 lastNameValue = lastNameTextEdit!!.text.toString()
                 ageValue = ageSlider!!.value.toInt().toString()
@@ -260,45 +444,53 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
                 sexValue = sexSpinner!!.selectedItem.toString()
                 activityLevelValue = activityLevelSpinner!!.selectedItem.toString()
 
-                bmrValue = calculateBMR(heightFeetValue, heightInchesValue, weightValue, sexValue, ageValue, activityLevelValue).toString()
-
+                val bmrIntValue = calculateBMR(heightFeetValue, heightInchesValue, weightValue, sexValue, ageValue, activityLevelValue)
+                bmrValue = if (bmrIntValue!! > 0) bmrIntValue.toString() else "BMR"
                 val formValuesArray : Array<String?> = arrayOf(firstNameValue, lastNameValue, ageValue, cityValue,
                     countryValue, heightFeetValue, heightInchesValue, weightValue, sexValue, activityLevelValue, bmrValue)
                 // Pass data back up to main activity
                 dataPasser!!.passProfileData(formValuesArray)
-                // Load the display fragment
-
-
-                //Start an activity and pass the data to it.
-//                val messageIntent = Intent(this, ProfileDisplayActivity::class.java)
-//                messageIntent.putExtra("NAME", "$firstNameValue $lastNameValue")
-//                messageIntent.putExtra("AGE", ageValue)
-//                messageIntent.putExtra("LOCATION", "$cityValue, $countryValue")
-//                messageIntent.putExtra("HEIGHT", heightFeetValue!! * 12 + heightInchesValue!!)
-//                messageIntent.putExtra("WEIGHT", weightValue)
-//                messageIntent.putExtra("SEX", sexValue)
-//                messageIntent.putExtra("ACTIVITY_LEVEL", activityLevelValue)
-//                this.startActivity(messageIntent)
             }
-            //this doesn't do anything, not sure how to make it go to the weather page from the button
-            //on the navbar...
-            /*R.id.action_weather -> {
-                cityValue = cityTextEdit!!.text.toString()
-                countryValue = countrySpinner!!.selectedItem.toString()
 
-                //Start an activity and pass the data to it.
-                val messageIntent = Intent(this, WeatherDisplayActivity::class.java)
-                messageIntent.putExtra("LOCATION", "$cityValue, $countryValue")
-                this.startActivity(messageIntent)
-            }*/
         }
     }
-
-    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-// Finish this
-      }
+    override fun onItemSelected(
+        parent: AdapterView<*>?,
+        view: View?, position: Int,
+        id: Long
+    ) {
+        // access selected country using countries[position]
+    }
 
     override fun onNothingSelected(p0: AdapterView<*>?) {
         TODO("Not yet implemented")
     }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    inner class GCListener : GeocodeListener {
+
+        override fun onGeocode(addresses: List<Address>) {
+            // do something with the location
+            var cityName: String = "Not found"
+            if (addresses != null) {
+                for (adrs in addresses) {
+                    if (adrs != null) {
+                        val city: String = adrs.locality
+                        if (city != null && city != "") {
+                            cityName = city
+                            println("city ::  $cityName")
+                        } else {
+                        }
+                        // you should also try with addresses.get(0).toSring();
+                    }
+                }
+            }
+            cityInput?.setText(cityName)
+        }
+
+        override fun onError(errorMessage: String?) {
+            super.onError(errorMessage)
+        }
+    }
+
 }

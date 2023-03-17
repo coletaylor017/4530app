@@ -1,6 +1,5 @@
 package com.cs4530.lifestyleapp
 
-import android.graphics.Movie
 import android.os.Bundle
 import android.os.Looper
 import android.view.MenuItem
@@ -27,6 +26,7 @@ class MainActivityNew : AppCompatActivity(), NavigationBarView.OnItemSelectedLis
     private var humidity: Double? = null
     private var tempHigh: Double? = null
     private var tempLow: Double? = null
+    private var bmrValue: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +40,17 @@ class MainActivityNew : AppCompatActivity(), NavigationBarView.OnItemSelectedLis
 
         // TODO: this is a hard-coded value, need to get their current location
         currentLocation = "Salt&Lake&City,us"
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putString("BMR_SCORE", bmrValue)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        bmrButton!!.text = bmrValue
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -74,7 +85,7 @@ class MainActivityNew : AppCompatActivity(), NavigationBarView.OnItemSelectedLis
             val lastName = data[1]
             val city = data[3]
             val country = data[4]
-            val bmr = data[10]
+            bmrValue = data[10]
 
             bundle.putString("NAME", "$firstName $lastName")
             bundle.putString("AGE", data[2])
@@ -84,10 +95,10 @@ class MainActivityNew : AppCompatActivity(), NavigationBarView.OnItemSelectedLis
             bundle.putString("WEIGHT", data[7])
             bundle.putString("SEX", data[8])
             bundle.putString("ACTIVITY_LEVEL", data[9])
-            bundle.putString("BMR_SCORE", bmr)
+            bundle.putString("BMR_SCORE", bmrValue)
 
             // Set the BMR score
-            bmrButton!!.text = bmr
+            bmrButton!!.text = bmrValue
 
             // Load the profile display fragment
             val profileDisplayFragment = ProfileDisplayFragment()

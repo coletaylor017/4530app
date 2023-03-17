@@ -27,7 +27,7 @@
                     tools:srcCompat="@tools:sample/avatars" />
 
                 <Button
-                    android:id="@+id/button_upload_photo"
+                    android:id="@+id/uploadPhotoButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignBottom="@id/iv_pic"
@@ -106,6 +106,25 @@
                 android:saveEnabled="false"
                 />
 
+            <Button
+                android:id="@+id/locationButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/iv_pic"
+                android:layout_alignParentRight="true"
+                android:text="Update Location" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lat/long"
+                android:id="@+id/latLong"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="City Name"
+                android:id="@+id/cityName"
+                />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -222,7 +241,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_marginTop="10dp"
                 android:text="submit"
-                android:id="@+id/button_submit"
+                android:id="@+id/submitButton"
                 />
 
     </LinearLayout>
