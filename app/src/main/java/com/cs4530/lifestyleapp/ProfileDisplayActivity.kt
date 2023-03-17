@@ -142,10 +142,10 @@ class ProfileDisplayActivity : AppCompatActivity() {
     private fun calculateBMR(height: Int, weight: Int, sex:String, age:Int): Int {
 
         if (sex == "Female") {
-            return (65.51 + (4.35 * weight) + (4.7 * height) - (4.7 * age)).toInt()
+            return (655.0 + (4.35 * weight) + (4.7 * height) - (4.7 * age)).toInt()
         }
         if (sex == "Male") {
-            return (66.47 + (6.24 * weight) + (12.7 * height) - (6.75 * age)).toInt()
+            return (66.0 + (6.23 * weight) + (12.7 * height) - (6.8 * age)).toInt()
         }
         return 0
     }
