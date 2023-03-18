@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
 import java.io.IOException
 import java.util.*
 
@@ -68,11 +69,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
     private var sexOptions : Array<String> = arrayOf("Prefer not to say", "Female", "Male")
     private var activityLevelOptions : Array<String> = arrayOf("Sedentary", "Lightly active", "Moderately active", "Active", "Very active")
 
-    private var cityInput : EditText? = null
-
-    private var latitude: Double? = null
-    private var longitude: Double? = null
-
     private lateinit var fusedLocationClient: FusedLocationProviderClient
 
     private lateinit var requestPermissionLauncher : ActivityResultLauncher<String>
@@ -108,8 +104,6 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         mButtonSubmit!!.setOnClickListener(this)
         mButtonLocation!!.setOnClickListener(this)
 
-        cityInput = findViewById(R.id.cityInput)
-
         // Define remaining values
         countryAdapter = setSpinnerData(R.id.countryInput, countryOptions)
         feetAdapter = setSpinnerData(R.id.heightFeetInput, heightFeetOptions)
@@ -131,75 +125,38 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         ) { isGranted : Boolean ->
             if (isGranted) {
                 Toast.makeText(this@MainActivity, "Location Permission Granted", Toast.LENGTH_SHORT).show();
+
+                fusedLocationClient.getCurrentLocation(PRIORITY_BALANCED_POWER_ACCURACY, null)
+                    .addOnSuccessListener { location : Location? ->
+                        // Got last known location. In some rare situations this can be null.
+//                        val latLongText = findViewById<TextView>(R.id.latLong)
+//                        latLongText.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
+                        if (location != null) {
+                            autofillLocation(location.latitude, location.longitude)
+                        }
+                        else
+                        {
+                            Toast.makeText(this@MainActivity, "There was a problem filling your location information automatically", Toast.LENGTH_SHORT).show();
+                        }
+                    }
             } else {
                 Toast.makeText(this@MainActivity, "Location Permission Denied", Toast.LENGTH_SHORT).show();
             }
         }
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-            Toast.makeText(this, "No location permission. Hikes not accurate.", Toast.LENGTH_SHORT).show()
-        }
-
-        val locationManager: LocationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val locationListener = object : LocationListener {
-            override fun onLocationChanged(location: Location) {
-                latitude = location.latitude
-                longitude = location.longitude
-                val latLongText = findViewById<TextView>(R.id.latLong)
-                latLongText.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
-                locationManager.removeUpdates(this)
-            }
-            override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
-                // Handle status changes
-                var yes : String? = null
-            }
-            override fun onProviderEnabled(provider: String) {
-                // Handle provider enabled
-                var yes : String? = null
-            }
-            override fun onProviderDisabled(provider: String) {
-                // Handle provider disabled
-                var yes : String? = null
-            }
-        }
-
-
-
     }
 
-
-//    override fun onRequestPermissionsResult(requestCode: Int,
-//                                            permissions: Array<String>,
-//                                            grantResults: IntArray) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        if (requestCode == 1) {
-//            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                Toast.makeText(this@MainActivity, "Location Permission Granted", Toast.LENGTH_SHORT)
-//                    .show()
-//
-//
-//            } else {
-//                Toast.makeText(this@MainActivity, "Location Permission Denied", Toast.LENGTH_SHORT)
-//                    .show()
-//            }
-//        }
-//    }
-
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    fun getLocationName(latitude: Double, longitude: Double): String? {
-        var cityName = "Not Found"
+    fun autofillLocation(locationLat: Double, locationLon: Double) {
         val gcd = Geocoder(this, Locale.getDefault())
         try {
             gcd.getFromLocation(
-                latitude, longitude,
+                locationLat, locationLon,
                 10,
                 gcListener
             )
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        return cityName
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -274,34 +231,24 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
     override fun onClick(view: View) {
         when (view.id) { //Added ? due to warning message. Consider better checks.
             R.id.LocationButton -> {
-
-
-
                 if (
-                    ActivityCompat.checkSelfPermission(
-                        this, Manifest.permission.ACCESS_COARSE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-                    || ActivityCompat.checkSelfPermission(
-                        this, Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
+                    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED
+                    || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED
                 ) {
-                    // You can use the API that requires the permission.
-                    Toast.makeText(this@MainActivity, "Location permission already granted", Toast.LENGTH_SHORT).show();
-
-
-                    fusedLocationClient.lastLocation
+                    // location permission has already been granted
+                    fusedLocationClient.getCurrentLocation(PRIORITY_BALANCED_POWER_ACCURACY, null)
                         .addOnSuccessListener { location : Location? ->
                             // Got last known location. In some rare situations this can be null.
-                            val latLongText = findViewById<TextView>(R.id.latLong)
-                            latLongText.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
+//                            val latLongText = findViewById<TextView>(R.id.latLong)
+//                            latLongText.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
                             if (location != null) {
-                                getLocationName(location.latitude, location.longitude)
+                                autofillLocation(location.latitude, location.longitude)
                             }
                         }
                 }
                 else {
-                    // You can directly ask for the permission.
-                    // The registered ActivityResultCallback gets the result of this request.
                     Toast.makeText(this@MainActivity, "Asking permission", Toast.LENGTH_SHORT).show();
                     requestPermissionLauncher.launch(
                         Manifest.permission.ACCESS_COARSE_LOCATION
@@ -442,24 +389,28 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
         override fun onGeocode(addresses: List<Address>) {
             // do something with the location
             var cityName: String = "Not found"
+
+            // get a few cities, just pick the first one that has a non-null city name
             if (addresses != null) {
                 for (adrs in addresses) {
                     if (adrs != null) {
                         val city: String = adrs.locality
-                        if (city != null && city != "") {
-                            cityName = city
-                            println("city ::  $cityName")
-                        } else {
+                        if (adrs.locality != null && adrs.locality != ""
+                                && adrs.countryName != null && adrs.countryName != "") {
+                            cityTextEdit?.setText(adrs.locality)
+//                            countryAdapter?.getPosition(adrs.countryName)
+//                                ?.let { countrySpinner?.setSelection(it) }
+                            return
                         }
-                        // you should also try with addresses.get(0).toSring();
                     }
                 }
             }
-            cityInput?.setText(cityName)
         }
 
         override fun onError(errorMessage: String?) {
-            super.onError(errorMessage)
+            runOnUiThread {
+                Toast.makeText(this@MainActivity, "There was a problem filling your location information automatically", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
