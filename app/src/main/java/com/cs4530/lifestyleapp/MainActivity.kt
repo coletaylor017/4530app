@@ -13,6 +13,7 @@ import android.os.Build
 import android.view.MenuItem
 import android.os.Bundle
 import android.provider.MediaStore
+import android.text.TextUtils
 import android.view.View
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
@@ -267,6 +268,23 @@ class MainActivity : AppCompatActivity(), View.OnClickListener, AdapterView.OnIt
                 }
             }
             R.id.button_submit -> {
+                /** Next three IF statements prevent 'submit' button crash due to not completing age, height, weight fields
+                 * If sliders implemented these can probably be removed. Imported text.utils to allow TextUtils.isEmpty check **/
+
+                if(TextUtils.isEmpty(ageTextEdit!!.text)) {
+                    Toast.makeText(this@MainActivity, "Age cannot be empty", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if(TextUtils.isEmpty(heightFeetSpinner!!.selectedItem.toString()) ||
+                    TextUtils.isEmpty(heightInchesSpinner!!.selectedItem.toString())) {
+                    Toast.makeText(this@MainActivity, "Height cannot be empty", Toast.LENGTH_SHORT).show();
+                    return
+                }
+                if(TextUtils.isEmpty(weightTextEdit!!.text)) {
+                    Toast.makeText(this@MainActivity, "Weight cannot be empty", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 firstNameValue = firstNameTextEdit!!.text.toString()
                 lastNameValue = lastNameTextEdit!!.text.toString()
                 ageValue = Integer.parseInt(ageTextEdit!!.text.toString())
