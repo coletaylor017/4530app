@@ -29,6 +29,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
 import java.io.IOException
 import java.util.*
 
@@ -45,8 +46,6 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
     private var sexValue: String? = null
     private var activityLevelValue: String? = null
     private var bmrValue: String? = null
-    private var latitude: Double? = null
-    private var longitude: Double? = null
 
     // Variables for UI elements
     private var firstNameTextEdit: EditText? = null
@@ -59,7 +58,6 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
     private var weightSlider: Slider? = null
     private var sexSpinner: Spinner? = null
     private var activityLevelSpinner: Spinner? = null
-    private var cityInput : EditText? = null
     private var latLongText: TextView? = null
 
     private var mButtonCamera: Button? = null
@@ -87,7 +85,7 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
     var dataPasser: ProfileEditDataPassingInterface? = null
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    private var gcListener : ProfileEditFragment.GCListener = GCListener()
+    private var gcListener : GCListener = GCListener()
 
     interface ProfileEditDataPassingInterface {
         fun passProfileData(data: Array<String?>?)
@@ -121,7 +119,6 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
         weightSlider = view.findViewById(R.id.weightInput)
         sexSpinner = view.findViewById(R.id.sexInput)
         activityLevelSpinner = view.findViewById(R.id.activityLevelInput)
-        latLongText = view.findViewById(R.id.latLong)
 
         //Get the buttons
         mButtonCamera = view.findViewById(R.id.uploadPhotoButton)
@@ -132,9 +129,6 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
         mButtonCamera!!.setOnClickListener(this)
         mButtonSubmit!!.setOnClickListener(this)
         mButtonLocation!!.setOnClickListener(this)
-
-        // TODO: this is a duplicate
-        cityInput = view.findViewById(R.id.cityInput)
 
         // Define remaining values
         countryAdapter = setSpinnerData(R.id.countryInput, countryOptions, view)
@@ -181,72 +175,41 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
             ActivityResultContracts.RequestPermission()
         ) { isGranted : Boolean ->
             if (isGranted) {
-                Toast.makeText(requireContext(), "Location Permission Granted", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Location Permission Granted", Toast.LENGTH_SHORT).show()
+
+                fusedLocationClient.getCurrentLocation(PRIORITY_BALANCED_POWER_ACCURACY, null)
+                    .addOnSuccessListener { location : Location? ->
+                        // Got last known location. In some rare situations this can be null.
+                        //                        val latLongText = findViewById<TextView>(R.id.latLong)
+                        //                        latLongText.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
+                        if (location != null) {
+                            autofillLocation(location.latitude, location.longitude)
+                        }
+                        else
+                        {
+                            Toast.makeText(requireContext(), "There was a problem filling your location information automatically", Toast.LENGTH_SHORT).show();
+                        }
+                    }
             } else {
-                Toast.makeText(requireContext(), "Location Permission Denied", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Location Permission Denied", Toast.LENGTH_SHORT).show()
             }
         }
 
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-        {
-            Toast.makeText(requireContext(), "No location permission. Hikes not accurate.", Toast.LENGTH_SHORT).show()
-        }
-
-        val locationManager: LocationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        val locationListener = object : LocationListener {
-            override fun onLocationChanged(location: Location) {
-                latitude = location.latitude
-                longitude = location.longitude
-                latLongText!!.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
-                locationManager.removeUpdates(this)
-            }
-            override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
-                // Handle status changes
-                var yes : String? = null
-            }
-            override fun onProviderEnabled(provider: String) {
-                // Handle provider enabled
-                var yes : String? = null
-            }
-            override fun onProviderDisabled(provider: String) {
-                // Handle provider disabled
-                var yes : String? = null
-            }
-        }
         return view
     }
 
-    //    override fun onRequestPermissionsResult(requestCode: Int,
-//                                            permissions: Array<String>,
-//                                            grantResults: IntArray) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        if (requestCode == 1) {
-//            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                Toast.makeText(this@MainActivity, "Location Permission Granted", Toast.LENGTH_SHORT)
-//                    .show()
-//
-//
-//            } else {
-//                Toast.makeText(this@MainActivity, "Location Permission Denied", Toast.LENGTH_SHORT)
-//                    .show()
-//            }
-//        }
-//    }
-
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    fun getLocationName(latitude: Double, longitude: Double): String? {
-        var cityName = "Not Found"
+    fun autofillLocation(locationLat: Double, locationLon: Double) {
         val gcd = Geocoder(requireContext(), Locale.getDefault())
         try {
             gcd.getFromLocation(
-                latitude, longitude,
+                locationLat, locationLon,
                 10,
                 gcListener
             )
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        return cityName
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -399,15 +362,14 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
                         requireContext(), Manifest.permission.ACCESS_FINE_LOCATION
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
-                    // You can use the API that requires the permission.
-                    Toast.makeText(requireContext(), "Location permission already granted", Toast.LENGTH_SHORT).show()
-
-                    fusedLocationClient.lastLocation
+                    // location permission has already been granted
+                    fusedLocationClient.getCurrentLocation(PRIORITY_BALANCED_POWER_ACCURACY, null)
                         .addOnSuccessListener { location : Location? ->
                             // Got last known location. In some rare situations this can be null.
-                            latLongText!!.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
+//                            val latLongText = findViewById<TextView>(R.id.latLong)
+//                            latLongText.text = "Latitude: ${location?.latitude} Longitude: ${location?.longitude}"
                             if (location != null) {
-                                getLocationName(location.latitude, location.longitude)
+                                autofillLocation(location.latitude, location.longitude)
                             }
                         }
                 }
@@ -461,6 +423,7 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
 
         }
     }
+
     override fun onItemSelected(
         parent: AdapterView<*>?,
         view: View?, position: Int,
@@ -479,24 +442,28 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
         override fun onGeocode(addresses: List<Address>) {
             // do something with the location
             var cityName: String = "Not found"
+
+            // get a few cities, just pick the first one that has a non-null city name
             if (addresses != null) {
                 for (adrs in addresses) {
                     if (adrs != null) {
                         val city: String = adrs.locality
-                        if (city != null && city != "") {
-                            cityName = city
-                            println("city ::  $cityName")
-                        } else {
+                        if (adrs.locality != null && adrs.locality != ""
+                            && adrs.countryName != null && adrs.countryName != "") {
+                            cityTextEdit?.setText(adrs.locality)
+//                            countryAdapter?.getPosition(adrs.countryName)
+//                                ?.let { countrySpinner?.setSelection(it) }
+                            return
                         }
-                        // you should also try with addresses.get(0).toSring();
                     }
                 }
             }
-            cityInput?.setText(cityName)
         }
 
         override fun onError(errorMessage: String?) {
-            super.onError(errorMessage)
+            requireActivity().runOnUiThread {
+                Toast.makeText(requireContext(), "There was a problem filling your location information automatically", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

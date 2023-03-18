@@ -28,7 +28,7 @@ class WeatherFragment: Fragment() {
             humidityReceived = requireArguments().getString("HUMIDITY")
         }
 
-        view.findViewById<TextView>(R.id.weather_tile)!!.text = temperatureReceived
+        view.findViewById<TextView>(R.id.weather_tile)!!.text = "$temperatureReceived º"
 
         return view
     }

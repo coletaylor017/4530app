@@ -12,6 +12,7 @@ import com.google.android.material.navigation.NavigationBarView
 import com.google.gson.GsonBuilder
 import org.json.JSONException
 import java.util.concurrent.Executors
+import kotlin.math.roundToInt
 
 
 class MainActivityNew : AppCompatActivity(), NavigationBarView.OnItemSelectedListener, ProfileEditFragment.ProfileEditDataPassingInterface {
@@ -22,10 +23,10 @@ class MainActivityNew : AppCompatActivity(), NavigationBarView.OnItemSelectedLis
     // Data vars
     private var currentLocation: String? = null
     private var mWeatherData: WeatherData? = null
-    private var temperature: Double? = null
+    private var temperature: Int? = null
     private var humidity: Double? = null
-    private var tempHigh: Double? = null
-    private var tempLow: Double? = null
+    private var tempHigh: Int? = null
+    private var tempLow: Int? = null
     private var bmrValue: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,6 +41,14 @@ class MainActivityNew : AppCompatActivity(), NavigationBarView.OnItemSelectedLis
 
         // TODO: this is a hard-coded value, need to get their current location
         currentLocation = "Salt&Lake&City,us"
+
+        //Instantiate the fragment
+        val profileEditFragment = ProfileEditFragment()
+
+        //Replace the fragment container
+        val fTrans = supportFragmentManager.beginTransaction()
+        fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
+        fTrans.commit()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -151,10 +160,12 @@ class MainActivityNew : AppCompatActivity(), NavigationBarView.OnItemSelectedLis
                     }
                     if (mWeatherData != null) {
                         val weatherFragment = WeatherFragment()
-                        // TODO: need to format temperatures from Kelvin
-//                        temperature =
-//                            "" + (mWeatherData!!.temperature - 273.15).roundToInt() + " C"
-                        temperature = mWeatherData!!.temperature
+                        temperature =
+                            (((mWeatherData!!.temperature?.minus(273.15))?.
+                                times(9)?.
+                                div(5))?.
+                                plus(32))?.
+                                roundToInt()
                         humidity = mWeatherData!!.humidity
                         tempLow = mWeatherData!!.tempLow
                         tempHigh = mWeatherData!!.tempHigh

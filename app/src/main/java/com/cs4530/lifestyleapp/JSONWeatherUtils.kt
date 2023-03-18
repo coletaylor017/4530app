@@ -18,9 +18,9 @@ object JSONWeatherUtils : JsonDeserializer<WeatherData> {
 
         val jsonMain = jsonObject.get("main")
         val weatherInfo = jsonMain.asJsonObject
-        weatherData.temperature = weatherInfo.get("temp").asDouble
-        weatherData.tempHigh = weatherInfo.get("temp_max").asDouble
-        weatherData.tempLow = weatherInfo.get("temp_min").asDouble
+        weatherData.temperature = weatherInfo.get("temp").asInt
+        weatherData.tempHigh = weatherInfo.get("temp_max").asInt
+        weatherData.tempLow = weatherInfo.get("temp_min").asInt
         weatherData.humidity = weatherInfo.get("humidity").asDouble
 
         return weatherData

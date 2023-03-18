@@ -113,18 +113,18 @@
                 android:layout_alignBottom="@id/iv_pic"
                 android:layout_alignParentRight="true"
                 android:text="Update Location" />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Lat/long"
-                android:id="@+id/latLong"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="City Name"
-                android:id="@+id/cityName"
-                />
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Lat/long"-->
+<!--                android:id="@+id/latLong"-->
+<!--                />-->
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="City Name"-->
+<!--                android:id="@+id/cityName"-->
+<!--                />-->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
