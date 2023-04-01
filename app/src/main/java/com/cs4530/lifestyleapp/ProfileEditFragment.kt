@@ -187,7 +187,7 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
                         }
                         else
                         {
-                            Toast.makeText(requireContext(), "There was a problem filling your location information automatically", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(requireContext(), "There was a problem filling your location information automatically", Toast.LENGTH_SHORT).show()
                         }
                     }
             } else {
@@ -353,7 +353,7 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onClick(view: View) {
         when (view?.id) { //Added ? due to warning message. Consider better checks.
-            R.id.LocationButton -> {
+            R.id.locationButton -> {
                 if (
                     ActivityCompat.checkSelfPermission(
                         requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION
