@@ -7,24 +7,23 @@ import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "weather_table")
-class WeatherData {
-    // TODO: what should the primary key be?
-    @field:ColumnInfo(name = "weather_id")
-    @field:PrimaryKey
-    var id: Int? = null
+data class WeatherData(
+    @field:ColumnInfo(name = "id")
+    @field:PrimaryKey(autoGenerate = true)
+    var id: Int,
 
     @field:ColumnInfo(name = "current_temperature")
     @SerializedName("temp")
-    var temperature: Int? = null
+    var temperature: Int,
 
     @field:ColumnInfo(name = "max_temperature")
     @SerializedName("temp_max")
-    var tempHigh: Int? = null
+    var tempHigh: Int,
 
     @field:ColumnInfo(name = "min_temperature")
     @SerializedName("temp_min")
-    var tempLow: Int? = null
+    var tempLow: Int,
 
     @field:ColumnInfo(name = "humidity")
-    var humidity: Double? = null
-}
+    var humidity: Double,
+)
