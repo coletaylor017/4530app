@@ -6,6 +6,8 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.HandlerCompat
+import androidx.activity.viewModels
+import androidx.lifecycle.Observer
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.navigation.NavigationBarView
@@ -22,12 +24,21 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
     // Data vars
     private var currentLocation: String? = null
-    private var mWeatherData: WeatherData? = null
+    private var mWeatherData: WeatherTable? = null
     private var temperature: Int? = null
     private var humidity: Double? = null
     private var tempHigh: Int? = null
     private var tempLow: Int? = null
     private var bmrValue: String? = null
+
+    // Initialize the view model here. One per activity.
+    // While initializing, we'll also inject the repository.
+    // However, standard view model constructor only takes a context to
+    // the activity. We'll need to define our own constructor, but this
+    // requires writing our own view model factory.
+    private val mWeatherViewModel: MainViewModel by viewModels {
+        MainViewModelFactory((application as MainApplication).repository)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,6 +53,9 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         // TODO: this is a hard-coded value, need to get their current location
         currentLocation = "Salt&Lake&City,us"
 
+        //Set the observer for the vanilla livedata object
+        mWeatherViewModel.data.observe(this, liveDataObserver)
+
         //Instantiate the fragment
         val profileEditFragment = ProfileEditFragment()
 
@@ -50,6 +64,16 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
         fTrans.commit()
     }
+
+    // TODO: this logic should go in the WeatherFragment
+    //create an observer that watches the LiveData<WeatherData> object
+    private val liveDataObserver: Observer<WeatherTable> =
+        Observer { weatherData -> // Update the UI if this data variable changes
+            if (weatherData != null) {
+                // TODO: set UI text data here
+//                mTvTemp!!.text = "" + (weatherData.temperature.temp - 273.15).roundToInt() + " C"
+            }
+        }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -152,9 +176,9 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
                 if (jsonWeatherData != null) {
                     try {
                         val gson = GsonBuilder()
-                            .registerTypeAdapter(WeatherData::class.java, JSONWeatherUtils)
+                            .registerTypeAdapter(WeatherTable::class.java, JSONWeatherUtils)
                             .create()
-                        mWeatherData = gson.fromJson(jsonWeatherData, WeatherData::class.java)
+                        mWeatherData = gson.fromJson(jsonWeatherData, WeatherTable::class.java)
                     } catch (e: JSONException) {
                         e.printStackTrace()
                     }
