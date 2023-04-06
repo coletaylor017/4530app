@@ -9,4 +9,12 @@ class UserTable {
     @field:ColumnInfo(name = "id")
     @field:PrimaryKey(autoGenerate = true)
     val id : Int = 0
+
+    @field:ColumnInfo(name = "first_name")
+    var firstName : String = ""
+
+    @field:ColumnInfo(name = "last_name")
+    var lastName : String = ""
+
+
 }
