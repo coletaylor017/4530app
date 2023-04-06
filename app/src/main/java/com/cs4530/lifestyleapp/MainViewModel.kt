@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 // Placeholder for ViewModel of main activity. Will be fully implemented after Repository and Room DB are finished.
 class MainViewModel(repository: MainRepository) :  ViewModel(){
     // Connect a live data object to the current bit of weather info
-    private val weatherData: LiveData<WeatherData> = repository.weatherData
+    private val weatherData: LiveData<WeatherTable> = repository.weatherData
 
     private var mRepository: MainRepository = repository
 
@@ -17,12 +17,12 @@ class MainViewModel(repository: MainRepository) :  ViewModel(){
     }
 
     // Returns the data contained in the live data object
-    val data: LiveData<WeatherData>
+    val data: LiveData<WeatherTable>
         get() = weatherData
 }
 
 // This factory class allows us to define custom constructors for the view model
-class ViewModelFactory(private val repository: MainRepository) : ViewModelProvider.Factory {
+class MainViewModelFactory(private val repository: MainRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

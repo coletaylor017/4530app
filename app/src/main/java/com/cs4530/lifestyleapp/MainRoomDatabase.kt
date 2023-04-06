@@ -10,9 +10,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-@Database(entities = [WeatherTable::class, UserTable::class], version = 1, exportSchema = false)
+// TODO: add UserTable as part of the entities list: entities = [WeatherTable::class, UserTable::class]
+@Database(entities = [WeatherTable::class], version = 1, exportSchema = false)
 abstract class MainRoomDatabase : RoomDatabase() {
-    abstract fun mainDao(): MainDao
+    // TODO: add UserDao here
+    abstract fun weatherDao(): WeatherDao
 
     // Make the db singleton. Could in theory
     // make this an object class, but the companion object approach
@@ -37,16 +39,17 @@ abstract class MainRoomDatabase : RoomDatabase() {
                 super.onCreate(db)
                 mInstance?.let { database ->
                     scope.launch(Dispatchers.IO){
-                        populateDbTask(database.mainDao())
+                        populateDbTask(database.weatherDao())
                     }
                 }
             }
         }
 
-        suspend fun populateDbTask (mainDao: MainDao) {
+        // TODO: add UserDao as a param
+        suspend fun populateDbTask (weatherDao: WeatherDao) {
             //TODO: Modify insert to fit data used in the two entities(tables)
 
-            //mainDao.insert(WeatherTable("Dummy_loc","Dummy_data"))
+            weatherDao.insert(WeatherTable(temperature = 100, tempHigh = 200, tempLow = 0, humidity = 100.0))
             //mainDao.insert(UserTable("dummy_info", "dummy_info"))
         }
     }

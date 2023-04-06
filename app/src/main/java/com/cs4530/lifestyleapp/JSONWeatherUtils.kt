@@ -6,14 +6,14 @@ import com.google.gson.JsonElement
 import java.lang.reflect.Type
 
 
-object JSONWeatherUtils : JsonDeserializer<WeatherData> {
+object JSONWeatherUtils : JsonDeserializer<WeatherTable> {
 
     override fun deserialize(
         json: JsonElement?,
         typeOfT: Type?,
         context: JsonDeserializationContext?
-    ): WeatherData {
-        val weatherData = WeatherData()
+    ): WeatherTable {
+        val weatherData = WeatherTable()
         val jsonObject = json!!.asJsonObject
 
         val jsonMain = jsonObject.get("main")

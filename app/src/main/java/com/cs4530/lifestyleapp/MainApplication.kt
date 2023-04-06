@@ -11,9 +11,6 @@ class MainApplication : Application() {
     // Inject scope and application context into singleton database
     val database by lazy{ MainRoomDatabase.getDatabase(this,applicationScope)}
 
-    //TODO: Add repository to application
-
-    // Inject database dao and scope into singleton repository
-    // maintain a single global scope used for all coroutine operations in the repository and db.
-    //val repository by lazy{ MainRepository.getInstance(database.MainDao(),applicationScope)}
+    //TODO: Add UserDao in this get instance
+    val repository by lazy{ MainRepository.getInstance(database.weatherDao(),applicationScope)}
 }

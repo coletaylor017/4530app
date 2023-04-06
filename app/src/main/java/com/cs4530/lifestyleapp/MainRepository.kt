@@ -11,7 +11,7 @@ import kotlin.math.roundToInt
 
 class MainRepository private constructor(weatherDao: WeatherDao) {
     // Weather fields
-    val weatherData = MutableLiveData<WeatherData>()
+    val weatherData = MutableLiveData<WeatherTable>()
     private var mWeatherDao: WeatherDao = weatherDao
     private var mJsonWeatherData: String? = null
     private var temperature: Int? = null
@@ -35,10 +35,10 @@ class MainRepository private constructor(weatherDao: WeatherDao) {
             if(mJsonWeatherData!=null) {
                 try {
                     val gson = GsonBuilder()
-                        .registerTypeAdapter(WeatherData::class.java, JSONWeatherUtils)
+                        .registerTypeAdapter(WeatherTable::class.java, JSONWeatherUtils)
                         .create()
 
-                    val data = gson.fromJson(mJsonWeatherData, WeatherData::class.java)
+                    val data = gson.fromJson(mJsonWeatherData, WeatherTable::class.java)
                     temperature =
                         (((data!!.temperature?.minus(273.15))?.
                         times(9)?.
@@ -62,8 +62,7 @@ class MainRepository private constructor(weatherDao: WeatherDao) {
     @WorkerThread
     suspend fun insert() {
         if (temperature != null && tempHigh !=null && tempLow !=null && humidity !=null) {
-            // TODO: we set the primary key to autogenerate in the WeatherData, but how do we not pass it as a param here?
-            mWeatherDao.insert(WeatherData(temperature!!, tempHigh!!, tempLow!!, humidity!!))
+            mWeatherDao.insert(WeatherTable(temperature = temperature!!, tempHigh = tempHigh!!, tempLow = tempLow!!, humidity = humidity!!))
         }
     }
 
