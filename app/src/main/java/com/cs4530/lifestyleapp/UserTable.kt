@@ -16,5 +16,27 @@ class UserTable {
     @field:ColumnInfo(name = "last_name")
     var lastName : String = ""
 
+    @field:ColumnInfo(name = "age")
+    var age: Int = 0
 
+    @field:ColumnInfo(name = "city")
+    var city: Int = 0
+
+    @field:ColumnInfo(name = "country")
+    var country: String? = null
+
+    @field:ColumnInfo(name = "height_feet")
+    var heightFeet: Int = 0
+
+    @field:ColumnInfo(name = "height_inches")
+    var heightInches: Int = 0
+
+    @field:ColumnInfo(name = "weight")
+    var weight: Int = 0
+
+    @field:ColumnInfo(name = "sex")
+    var sex: String? = null
+
+    @field:ColumnInfo(name = "activityLevel")
+    var activityLevel: String? = null
 }
