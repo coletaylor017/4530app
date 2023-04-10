@@ -22,7 +22,7 @@ class MainRepository private constructor(weatherDao: WeatherDao) {
 
     private var mLocation: String? = null
 
-    fun setLocation(location: String) {
+    fun setWeather(location: String) {
         // First cache the location
         mLocation = location
 
