@@ -11,13 +11,13 @@ class MainViewModel(repository: MainRepository) :  ViewModel(){
 
     private var mRepository: MainRepository = repository
 
-    fun setLocation(location: String) {
+    fun setWeather(location: String) {
         // Simply pass the location to the repository
-        mRepository.setLocation(location)
+        mRepository.setWeather(location)
     }
 
     // Returns the data contained in the live data object
-    val data: LiveData<WeatherTable>
+    val dataWeather: LiveData<WeatherTable>
         get() = weatherData
 }
 

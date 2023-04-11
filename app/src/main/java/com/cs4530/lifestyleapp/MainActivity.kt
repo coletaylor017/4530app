@@ -7,13 +7,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.HandlerCompat
 import androidx.activity.viewModels
-import androidx.lifecycle.Observer
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.navigation.NavigationBarView
-import com.google.gson.GsonBuilder
-import org.json.JSONException
-import java.util.concurrent.Executors
 import kotlin.math.roundToInt
 
 
@@ -24,11 +20,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
     // Data vars
     private var currentLocation: String? = null
-    private var mWeatherData: WeatherTable? = null
-    private var temperature: Int? = null
-    private var humidity: Double? = null
-    private var tempHigh: Int? = null
-    private var tempLow: Int? = null
     private var bmrValue: String? = null
 
     // Initialize the view model here. One per activity.
@@ -36,7 +27,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
     // However, standard view model constructor only takes a context to
     // the activity. We'll need to define our own constructor, but this
     // requires writing our own view model factory.
-    private val mWeatherViewModel: MainViewModel by viewModels {
+    private val mViewModel: MainViewModel by viewModels {
         MainViewModelFactory((application as MainApplication).repository)
     }
 
@@ -53,9 +44,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         // TODO: this is a hard-coded value, need to get their current location
         currentLocation = "Salt&Lake&City,us"
 
-        //Set the observer for the vanilla livedata object
-        mWeatherViewModel.data.observe(this, liveDataObserver)
-
         //Instantiate the fragment
         val profileEditFragment = ProfileEditFragment()
 
@@ -64,16 +52,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
         fTrans.commit()
     }
-
-    // TODO: this logic should go in the WeatherFragment
-    //create an observer that watches the LiveData<WeatherData> object
-    private val liveDataObserver: Observer<WeatherTable> =
-        Observer { weatherData -> // Update the UI if this data variable changes
-            if (weatherData != null) {
-                // TODO: set UI text data here
-//                mTvTemp!!.text = "" + (weatherData.temperature.temp - 273.15).roundToInt() + " C"
-            }
-        }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
@@ -100,8 +78,11 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
             }
             R.id.action_weather -> {
                 val sanitizedLocation = currentLocation!!.replace(' ', '&')
-                loadWeatherData(sanitizedLocation)
-
+                mViewModel.setWeather(sanitizedLocation)
+                val weatherFragment = WeatherFragment()
+                val fTrans = supportFragmentManager.beginTransaction()
+                fTrans.replace(R.id.fragment_placeholder, weatherFragment, "Weather_Frag")
+                fTrans.commit()
                 true
             }
             else -> false
@@ -144,69 +125,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
                 "Profile_Display_Frag"
             )
             fTrans.commit()
-        }
-    }
-
-    private fun loadWeatherData(location: String) {
-        try {
-            FetchWeatherTask().execute(location)
-        } catch(e: Exception) {
-            Toast.makeText(this, "Could not load weather data", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private inner class FetchWeatherTask {
-        var executorService = Executors.newSingleThreadExecutor()!!
-        var mainThreadHandler = HandlerCompat.createAsync(Looper.getMainLooper())
-        fun execute(location: String?) {
-            executorService.execute {
-                var jsonWeatherData: String?
-                val weatherDataURL = WeatherNetworkUtils.buildURLFromString(location!!)
-                try {
-                    jsonWeatherData = WeatherNetworkUtils.getDataFromURL(weatherDataURL!!)
-                    postToMainThread(jsonWeatherData)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
-
-        private fun postToMainThread(jsonWeatherData: String?) {
-            mainThreadHandler.post {
-                if (jsonWeatherData != null) {
-                    try {
-                        val gson = GsonBuilder()
-                            .registerTypeAdapter(WeatherTable::class.java, JSONWeatherUtils)
-                            .create()
-                        mWeatherData = gson.fromJson(jsonWeatherData, WeatherTable::class.java)
-                    } catch (e: JSONException) {
-                        e.printStackTrace()
-                    }
-                    if (mWeatherData != null) {
-                        val weatherFragment = WeatherFragment()
-                        temperature =
-                            (((mWeatherData!!.temperature?.minus(273.15))?.
-                                times(9)?.
-                                div(5))?.
-                                plus(32))?.
-                                roundToInt()
-                        humidity = mWeatherData!!.humidity
-                        tempLow = mWeatherData!!.tempLow
-                        tempHigh = mWeatherData!!.tempHigh
-
-                        val bundle = Bundle()
-                        bundle.putString("TEMP", temperature.toString())
-                        bundle.putString("TEMP_HIGH", tempHigh.toString())
-                        bundle.putString("TEMP_LOW", tempLow.toString())
-                        bundle.putString("HUMIDITY", humidity.toString())
-
-                        weatherFragment.arguments = bundle
-                        val fTrans = supportFragmentManager.beginTransaction()
-                        fTrans.replace(R.id.fragment_placeholder, weatherFragment, "Weather_Frag")
-                        fTrans.commit()
-                    }
-                }
-            }
         }
     }
 
