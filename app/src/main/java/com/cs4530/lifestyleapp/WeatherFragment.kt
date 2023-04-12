@@ -16,6 +16,10 @@ class WeatherFragment: Fragment() {
     private var humidityReceived : String? = null
 
     private var temperatureTile : TextView? = null
+    private var highTempTextView : TextView? = null
+    private var lowTempTextView : TextView? = null
+    private var humidityTextView : TextView? = null
+    private var iconTextView : TextView? = null
 
     // Get the view model
     private val mViewModel: MainViewModel by activityViewModels()
@@ -29,16 +33,10 @@ class WeatherFragment: Fragment() {
 
         mViewModel.dataWeather.observe(requireActivity(), liveDataObserver)
         temperatureTile = view.findViewById<TextView>(R.id.weather_tile)
-
-        //Get the string data
-        if (arguments != null) {
-            temperatureReceived = requireArguments().getString("TEMP")
-            highReceived = requireArguments().getString("TEMP_HIGH")
-            lowReceived = requireArguments().getString("TEMP_LOW")
-            humidityReceived = requireArguments().getString("HUMIDITY")
-        }
-
-        temperatureTile!!.text = "$temperatureReceived º"
+        highTempTextView = view.findViewById<TextView>(R.id.high_temp_value)
+        lowTempTextView = view.findViewById<TextView>(R.id.low_temp_value)
+        humidityTextView = view.findViewById<TextView>(R.id.humidity_value)
+        iconTextView = view.findViewById<TextView>(R.id.icon_value)
 
         return view
     }
@@ -48,6 +46,10 @@ class WeatherFragment: Fragment() {
         Observer { weatherData -> // Update the UI if this data variable changes
             if (weatherData != null) {
                 temperatureTile!!.text = "" + weatherData.temperature + "º F"
+                highTempTextView!!.text = "" + weatherData.tempHigh + "º F"
+                lowTempTextView!!.text = "" + weatherData.tempLow + "º F"
+                humidityTextView!!.text = "" + weatherData.humidity + "%"
+                iconTextView!!.text = weatherData.icon
             }
         }
 }

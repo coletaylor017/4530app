@@ -15,9 +15,10 @@ class MainRepository private constructor(weatherDao: WeatherDao) {
     private var mWeatherDao: WeatherDao = weatherDao
     private var mJsonWeatherData: String? = null
     private var temperature: Int? = null
-    private var humidity: Double? = null
+    private var humidity: Int? = null
     private var tempHigh: Int? = null
     private var tempLow: Int? = null
+    private var weatherIcon: String? = null
 
 
     private var mLocation: String? = null
@@ -39,15 +40,11 @@ class MainRepository private constructor(weatherDao: WeatherDao) {
                         .create()
 
                     val data = gson.fromJson(mJsonWeatherData, WeatherTable::class.java)
-                    temperature =
-                        (((data!!.temperature?.minus(273.15))?.
-                        times(9)?.
-                        div(5))?.
-                        plus(32))?.
-                        roundToInt()
+                    temperature = data!!.temperature
                     humidity = data!!.humidity
                     tempLow = data!!.tempLow
                     tempHigh = data!!.tempHigh
+                    weatherIcon = data!!.icon
 
                     weatherData.postValue(data)
 
@@ -62,7 +59,7 @@ class MainRepository private constructor(weatherDao: WeatherDao) {
     @WorkerThread
     suspend fun insert() {
         if (temperature != null && tempHigh !=null && tempLow !=null && humidity !=null) {
-            mWeatherDao.insert(WeatherTable(temperature = temperature!!, tempHigh = tempHigh!!, tempLow = tempLow!!, humidity = humidity!!))
+            mWeatherDao.insert(WeatherTable(temperature = temperature!!, tempHigh = tempHigh!!, tempLow = tempLow!!, humidity = humidity!!, icon = weatherIcon!!))
         }
     }
 

@@ -25,5 +25,8 @@ data class WeatherTable(
     var tempLow: Int? = null,
 
     @field:ColumnInfo(name = "humidity")
-    var humidity: Double? = null,
+    var humidity: Int? = null,
+
+    @field:ColumnInfo(name = "icon")
+    var icon: String? = null,
 )

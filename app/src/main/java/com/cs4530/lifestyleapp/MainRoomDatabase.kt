@@ -49,7 +49,7 @@ abstract class MainRoomDatabase : RoomDatabase() {
         suspend fun populateDbTask (weatherDao: WeatherDao) {
             //TODO: Modify insert to fit data used in the two entities(tables)
 
-            weatherDao.insert(WeatherTable(temperature = 100, tempHigh = 200, tempLow = 0, humidity = 100.0))
+            weatherDao.insert(WeatherTable(temperature = 100, tempHigh = 200, tempLow = 0, humidity = 100))
             //mainDao.insert(UserTable("dummy_info", "dummy_info"))
         }
     }
