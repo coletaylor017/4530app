@@ -17,10 +17,8 @@ object JSONWeatherUtils : JsonDeserializer<WeatherTable> {
         val weatherData = WeatherTable()
         val jsonObject = json!!.asJsonObject
 
-        // TODO: issue with get("weather") bc it's an array of objects, not an object
-        // https://openweathermap.org/api/one-call-3
-        //https://openweathermap.org/weather-conditions#How-to-get-icon-URL
-        // val iconsInfo = jsonObject.get("weather").asJsonObject
+        val iconsInfo = jsonObject.get("weather").asJsonArray
+        val iconId = iconsInfo[0].asJsonObject.get("icon").asString
         val weatherInfo = jsonObject.get("main").asJsonObject
         val currentTemp = getFahrenheit(weatherInfo.get("temp").asInt)
         val currentHighTemp = getFahrenheit(weatherInfo.get("temp_max").asInt)
@@ -30,8 +28,7 @@ object JSONWeatherUtils : JsonDeserializer<WeatherTable> {
         weatherData.tempHigh = currentHighTemp
         weatherData.tempLow = currentLowTemp
         weatherData.humidity = weatherInfo.get("humidity").asInt
-        // weatherData.icon = iconsInfo.get("icon").asString
-        weatherData.icon = "TBD"
+        weatherData.icon = "https://openweathermap.org/img/wn/$iconId@2x.png"
 
         return weatherData
     }
