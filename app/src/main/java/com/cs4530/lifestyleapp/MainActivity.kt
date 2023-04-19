@@ -45,7 +45,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         currentLocation = "Salt&Lake&City,us"
 
         //Instantiate the fragment
-        val profileEditFragment = ProfileEditFragment()
+        val profileEditFragment = ProfileEditFragment(mViewModel)
 
         //Replace the fragment container
         val fTrans = supportFragmentManager.beginTransaction()

@@ -25,6 +25,7 @@ import android.content.pm.PackageManager
 import android.location.*
 import android.location.Geocoder.GeocodeListener
 import android.text.TextUtils
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -32,6 +33,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
 import java.io.IOException
 import java.util.*
+import androidx.activity.viewModels
 
 class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemSelectedListener {
     // Variables to hold values of UI elements
@@ -86,6 +88,12 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private var gcListener : GCListener = GCListener()
+
+    private var model: MainViewModel
+
+    constructor(model : MainViewModel) {
+        this.model = model
+    }
 
     interface ProfileEditDataPassingInterface {
         fun passProfileData(data: Array<String?>?)
@@ -419,6 +427,11 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
                     countryValue, heightFeetValue, heightInchesValue, weightValue, sexValue, activityLevelValue, bmrValue)
                 // Pass data back up to main activity
                 dataPasser!!.passProfileData(formValuesArray)
+
+                // Save user data to main repository
+                model.setUserData()
+
+
             }
 
         }

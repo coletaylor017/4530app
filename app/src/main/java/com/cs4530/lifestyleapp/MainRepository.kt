@@ -56,6 +56,40 @@ class MainRepository private constructor(weatherDao: WeatherDao) {
         }
     }
 
+    fun setWeather(
+        firstName : String,
+        lastName : String,
+        age : Int,
+        city : String,
+        country : String,
+        heightFeet : Int,
+        heightInches : Int,
+        weight : Int,
+        sex : String,
+        activityLevel: String
+    ) {
+        mScope.launch(Dispatchers.IO){
+            try {
+                val gson = GsonBuilder()
+                    .registerTypeAdapter(UserTable::class.java, JSONWeatherUtils)
+                    .create()
+
+                val data = gson.fromJson(mJsonWeatherData, WeatherTable::class.java)
+                temperature = data!!.temperature
+                humidity = data!!.humidity
+                tempLow = data!!.tempLow
+                tempHigh = data!!.tempHigh
+                weatherIcon = data!!.icon
+
+                weatherData.postValue(data)
+
+                insert()
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }
+    }
+
     @WorkerThread
     suspend fun insert() {
         if (temperature != null && tempHigh !=null && tempLow !=null && humidity !=null) {
