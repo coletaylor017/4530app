@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.squareup.picasso.Picasso
 
 class WeatherFragment: Fragment() {
     private var temperatureReceived : String? = null
@@ -19,7 +21,7 @@ class WeatherFragment: Fragment() {
     private var highTempTextView : TextView? = null
     private var lowTempTextView : TextView? = null
     private var humidityTextView : TextView? = null
-    private var iconTextView : TextView? = null
+    private var iconImageView : ImageView? = null
 
     // Get the view model
     private val mViewModel: MainViewModel by activityViewModels()
@@ -30,13 +32,13 @@ class WeatherFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_weather_view, container, false)
-
-        mViewModel.dataWeather.observe(requireActivity(), liveDataObserver)
         temperatureTile = view.findViewById<TextView>(R.id.weather_tile)
         highTempTextView = view.findViewById<TextView>(R.id.high_temp_value)
         lowTempTextView = view.findViewById<TextView>(R.id.low_temp_value)
         humidityTextView = view.findViewById<TextView>(R.id.humidity_value)
-        iconTextView = view.findViewById<TextView>(R.id.icon_value)
+        iconImageView = view.findViewById<ImageView>(R.id.weather_icon)
+
+        mViewModel.dataWeather.observe(requireActivity(), liveDataObserver)
 
         return view
     }
@@ -49,7 +51,11 @@ class WeatherFragment: Fragment() {
                 highTempTextView!!.text = "" + weatherData.tempHigh + "º F"
                 lowTempTextView!!.text = "" + weatherData.tempLow + "º F"
                 humidityTextView!!.text = "" + weatherData.humidity + "%"
-                iconTextView!!.text = weatherData.icon
+                Picasso.get()
+                    .load(weatherData.icon)
+                    .resize(200, 200)
+                    .error(R.drawable.baseline_wb_sunny_18)
+                    .into(iconImageView)
             }
         }
 }
