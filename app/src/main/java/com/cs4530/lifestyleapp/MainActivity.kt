@@ -68,7 +68,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         when (item.itemId) {
             R.id.action_profile -> {
                 //Instantiate the fragment
-                val profileEditFragment = ProfileEditFragment()
+                val profileEditFragment = ProfileEditFragment(mViewModel)
 
                 //Replace the fragment container
                 val fTrans = supportFragmentManager.beginTransaction()

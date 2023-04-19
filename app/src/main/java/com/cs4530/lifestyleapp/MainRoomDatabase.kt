@@ -10,10 +10,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-// TODO: add UserTable as part of the entities list: entities = [WeatherTable::class, UserTable::class]
-@Database(entities = [WeatherTable::class], version = 1, exportSchema = false)
+@Database(entities = [WeatherTable::class, UserTable::class], version = 1, exportSchema = false)
 abstract class MainRoomDatabase : RoomDatabase() {
-    // TODO: add UserDao here
+
+    abstract fun userDao(): UserDao
+
     abstract fun weatherDao(): WeatherDao
 
     // Make the db singleton. Could in theory

@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import org.json.JSONException
 import kotlin.math.roundToInt
 
-class MainRepository private constructor(weatherDao: WeatherDao) {
+class MainRepository private constructor(weatherDao: WeatherDao, userDao: UserDao) {
     // Weather fields
     val weatherData = MutableLiveData<WeatherTable>()
     private var mWeatherDao: WeatherDao = weatherDao
@@ -20,6 +20,9 @@ class MainRepository private constructor(weatherDao: WeatherDao) {
     private var tempLow: Int? = null
     private var weatherIcon: String? = null
 
+
+    val userData = MutableLiveData<UserTable>()
+    private var mUserDao: UserDao = userDao
 
     private var mLocation: String? = null
 
@@ -56,34 +59,34 @@ class MainRepository private constructor(weatherDao: WeatherDao) {
         }
     }
 
-    fun setWeather(
+    fun setUserInfo(
         firstName : String,
         lastName : String,
         age : Int,
         city : String,
         country : String,
-        heightFeet : Int,
-        heightInches : Int,
+        height : Int,
         weight : Int,
         sex : String,
         activityLevel: String
     ) {
         mScope.launch(Dispatchers.IO){
             try {
-                val gson = GsonBuilder()
-                    .registerTypeAdapter(UserTable::class.java, JSONWeatherUtils)
-                    .create()
 
-                val data = gson.fromJson(mJsonWeatherData, WeatherTable::class.java)
-                temperature = data!!.temperature
-                humidity = data!!.humidity
-                tempLow = data!!.tempLow
-                tempHigh = data!!.tempHigh
-                weatherIcon = data!!.icon
+                val newUser = UserTable(
+                    firstName = firstName,
+                    lastName = lastName,
+                    age = age,
+                    city = city,
+                    country = country,
+                    weight = weight,
+                    height = height,
+                    sex = sex,
+                    activityLevel = activityLevel
+                )
+                userData.postValue(newUser)
 
-                weatherData.postValue(data)
-
-                insert()
+                mUserDao.insert(newUser)
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
@@ -117,11 +120,12 @@ class MainRepository private constructor(weatherDao: WeatherDao) {
         private lateinit var mScope: CoroutineScope
         @Synchronized
         fun getInstance(weatherDao: WeatherDao,
+                        userDao: UserDao,
                         scope: CoroutineScope
         ): MainRepository {
             mScope = scope
             return mInstance?: synchronized(this){
-                val instance = MainRepository(weatherDao)
+                val instance = MainRepository(weatherDao, userDao)
                 mInstance = instance
                 instance
             }
