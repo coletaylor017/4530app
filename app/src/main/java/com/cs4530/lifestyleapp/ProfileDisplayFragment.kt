@@ -113,6 +113,10 @@ class ProfileDisplayFragment: Fragment() {
             mIvPic = view.findViewById<View>(R.id.profile_pic) as ImageView
             mIvPic!!.setImageBitmap(bits)
         }
+        else { //Default view is a person silhouette
+            mIvPic = view.findViewById<View>(R.id.profile_pic) as ImageView
+            mIvPic!!.setImageResource(R.drawable.baseline_person_24)
+        }
 
         /** This block prevents hike button from being active if location is disabled. Otherwise implements **/
         if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)

@@ -5,6 +5,7 @@
     tools:context=".ProfileEditFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/MyScrollViewStyle"
     android:id="@+id/scroll_view">
 
         <LinearLayout
@@ -15,28 +16,21 @@
             android:orientation="vertical"
             >
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:layout_marginBottom="20dp">
 
-                <ImageView
-                    android:id="@+id/iv_pic"
-                    android:layout_width="207dp"
-                    android:layout_height="189dp"
-                    tools:srcCompat="@tools:sample/avatars" />
+            <ImageView
+                android:id="@+id/iv_pic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                tools:srcCompat="@tools:sample/avatars" />
 
-                <Button
-                    android:id="@+id/uploadPhotoButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/iv_pic"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginTop="18dp"
-                    android:layout_marginEnd="11dp"
-                    android:layout_marginBottom="-55dp"
-                    android:text="Upload Photo" />
-            </RelativeLayout>
+            <Button
+                android:id="@+id/uploadPhotoButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="Upload Photo" />
+
 
             <TextView
                 android:layout_width="wrap_content"
@@ -110,6 +104,7 @@
                 android:id="@+id/locationButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
                 android:layout_alignBottom="@id/iv_pic"
                 android:layout_alignParentRight="true"
                 android:text="Update Location" />

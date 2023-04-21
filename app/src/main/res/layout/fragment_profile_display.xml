@@ -4,23 +4,75 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:gravity="center"
     tools:context=".ProfileDisplayFragment"
     android:padding="16dp"
     android:orientation="vertical"
     >
 
-    <ImageView
-        android:id="@+id/profile_pic"
-        android:layout_width="fill_parent"
-        android:layout_height="171dp"
-        tools:srcCompat="@tools:sample/avatars" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:layout_marginTop="10dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/profile_pic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:srcCompat="@tools:sample/avatars" />
+        <Button
+            android:id="@+id/find_hike"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Find Hike Near Me" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/bmr_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:text="@string/bmr_header"
+                style="@style/Title.Small" />
+
+            <TextView
+                android:id="@+id/bmr_score"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_below="@id/bmr_header"
+                android:layout_centerHorizontal="true"
+                android:background="@drawable/bmr_circle"
+                android:gravity="center"
+                android:layout_marginTop="10dp"
+                android:text="BMR Score"
+                android:textColor="#000000"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
 
     <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:stretchColumns="0,1"
-        android:layout_marginBottom="15dp"
-        >
+        android:layout_weight="1"
+        android:gravity="center"
+        android:stretchColumns="0,1">
         <TableRow>
             <TextView
                 android:text="@string/name_label"
@@ -92,38 +144,5 @@
                 />
         </TableRow>
     </TableLayout>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
-        <TextView
-            android:id="@+id/bmr_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="@string/bmr_header"
-            style="@style/Title.Small" />
-
-        <TextView
-            android:id="@+id/bmr_score"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_below="@id/bmr_header"
-            android:layout_centerHorizontal="true"
-            android:background="@drawable/bmr_circle"
-            android:gravity="center"
-            android:layout_marginTop="10dp"
-            android:text="BMR Score"
-            android:textColor="#000000"
-            android:textSize="14sp" />
-    </RelativeLayout>
-
-    <Button
-        android:id="@+id/find_hike"
-        android:layout_marginTop="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Find Hike Near Me" />
 
 </LinearLayout>
