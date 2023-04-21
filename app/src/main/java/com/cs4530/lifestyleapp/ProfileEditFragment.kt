@@ -168,6 +168,10 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
             mIvPic = view.findViewById<View>(R.id.iv_pic) as ImageView
             mIvPic!!.setImageBitmap(bits)
         }
+        else { //Default view is a person silhouette
+            mIvPic = view.findViewById<View>(R.id.iv_pic) as ImageView
+            mIvPic!!.setImageResource(R.drawable.baseline_person_24)
+        }
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
 
