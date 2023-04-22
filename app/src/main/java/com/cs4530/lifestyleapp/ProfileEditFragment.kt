@@ -35,7 +35,7 @@ import java.io.IOException
 import java.util.*
 import androidx.activity.viewModels
 
-class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemSelectedListener {
+class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListener, AdapterView.OnItemSelectedListener {
     // Variables to hold values of UI elements
     private var firstNameValue: String? = null
     private var lastNameValue: String? = null
@@ -91,7 +91,7 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
 
     private var model: MainViewModel
 
-    constructor(model : MainViewModel) {
+    init {
         this.model = model
     }
 
@@ -412,12 +412,14 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
 
                 firstNameValue = firstNameTextEdit!!.text.toString()
                 lastNameValue = lastNameTextEdit!!.text.toString()
-                ageValue = ageSlider!!.value.toInt().toString()
+                val ageValueInt = ageSlider!!.value.toInt()
+                ageValue = ageValueInt.toString()
                 cityValue = cityTextEdit!!.text.toString()
                 countryValue = countrySpinner!!.selectedItem.toString()
                 heightFeetValue = heightFeetSpinner!!.selectedItem.toString()
                 heightInchesValue = heightInchesSpinner!!.selectedItem.toString()
-                weightValue = weightSlider!!.value.toInt().toString()
+                val weightValueInt = weightSlider!!.value.toInt()
+                weightValue = weightValueInt.toString()
                 sexValue = sexSpinner!!.selectedItem.toString()
                 activityLevelValue = activityLevelSpinner!!.selectedItem.toString()
 
@@ -429,7 +431,20 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
                 dataPasser!!.passProfileData(formValuesArray)
 
                 // Save user data to main repository
-                model.setUserData()
+                val newUser = UserTable(
+                    firstName = firstNameValue,
+                    lastName = lastNameValue,
+                    age = ageValueInt,
+                    city = cityValue,
+                    country = countryValue,
+                    height = heightFeetValue!!.toInt() * 12 + heightInchesValue!!.toInt(),
+                    weight = weightValueInt,
+                    sex = sexValue,
+                    activityLevel = activityLevelValue,
+                    bmr = bmrIntValue
+                )
+
+                model.setUserData(newUser)
 
 
             }

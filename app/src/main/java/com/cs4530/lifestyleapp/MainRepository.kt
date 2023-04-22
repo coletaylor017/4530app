@@ -59,31 +59,9 @@ class MainRepository private constructor(weatherDao: WeatherDao, userDao: UserDa
         }
     }
 
-    fun setUserInfo(
-        firstName : String,
-        lastName : String,
-        age : Int,
-        city : String,
-        country : String,
-        height : Int,
-        weight : Int,
-        sex : String,
-        activityLevel: String
-    ) {
+    fun setUserData(newUser: UserTable) {
         mScope.launch(Dispatchers.IO){
             try {
-
-                val newUser = UserTable(
-                    firstName = firstName,
-                    lastName = lastName,
-                    age = age,
-                    city = city,
-                    country = country,
-                    weight = weight,
-                    height = height,
-                    sex = sex,
-                    activityLevel = activityLevel
-                )
                 userData.postValue(newUser)
 
                 mUserDao.insert(newUser)
