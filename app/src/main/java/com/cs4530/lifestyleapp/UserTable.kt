@@ -21,16 +21,16 @@ data class UserTable(
     var age: Int? = 0,
 
     @field:ColumnInfo(name = "city")
-    var city: Int? = 0,
+    var city: String? = null,
 
     @field:ColumnInfo(name = "country")
     var country: String? = null,
 
-    @field:ColumnInfo(name = "height_feet")
-    var heightFeet: Int? = 0,
-
-    @field:ColumnInfo(name = "height_inches")
-    var heightInches: Int? = 0,
+    /**
+     * Height in inches
+     */
+    @field:ColumnInfo(name = "height")
+    var height: Int? = 0,
 
     @field:ColumnInfo(name = "weight")
     var weight: Int? = 0,

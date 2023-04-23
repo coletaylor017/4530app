@@ -19,6 +19,10 @@ class MainViewModel(repository: MainRepository) :  ViewModel(){
     // Returns the data contained in the live data object
     val dataWeather: LiveData<WeatherTable>
         get() = weatherData
+
+    fun setUserData(user: UserTable) {
+        mRepository.setUserData(user)
+    }
 }
 
 // This factory class allows us to define custom constructors for the view model

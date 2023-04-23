@@ -25,6 +25,7 @@ import android.content.pm.PackageManager
 import android.location.*
 import android.location.Geocoder.GeocodeListener
 import android.text.TextUtils
+import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -32,8 +33,9 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
 import java.io.IOException
 import java.util.*
+import androidx.activity.viewModels
 
-class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemSelectedListener {
+class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListener, AdapterView.OnItemSelectedListener {
     // Variables to hold values of UI elements
     private var firstNameValue: String? = null
     private var lastNameValue: String? = null
@@ -86,6 +88,12 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private var gcListener : GCListener = GCListener()
+
+    private var model: MainViewModel
+
+    init {
+        this.model = model
+    }
 
     interface ProfileEditDataPassingInterface {
         fun passProfileData(data: Array<String?>?)
@@ -408,12 +416,14 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
 
                 firstNameValue = firstNameTextEdit!!.text.toString()
                 lastNameValue = lastNameTextEdit!!.text.toString()
-                ageValue = ageSlider!!.value.toInt().toString()
+                val ageValueInt = ageSlider!!.value.toInt()
+                ageValue = ageValueInt.toString()
                 cityValue = cityTextEdit!!.text.toString()
                 countryValue = countrySpinner!!.selectedItem.toString()
                 heightFeetValue = heightFeetSpinner!!.selectedItem.toString()
                 heightInchesValue = heightInchesSpinner!!.selectedItem.toString()
-                weightValue = weightSlider!!.value.toInt().toString()
+                val weightValueInt = weightSlider!!.value.toInt()
+                weightValue = weightValueInt.toString()
                 sexValue = sexSpinner!!.selectedItem.toString()
                 activityLevelValue = activityLevelSpinner!!.selectedItem.toString()
 
@@ -423,6 +433,24 @@ class ProfileEditFragment: Fragment(), View.OnClickListener, AdapterView.OnItemS
                     countryValue, heightFeetValue, heightInchesValue, weightValue, sexValue, activityLevelValue, bmrValue)
                 // Pass data back up to main activity
                 dataPasser!!.passProfileData(formValuesArray)
+
+                // Save user data to main repository
+                val newUser = UserTable(
+                    firstName = firstNameValue,
+                    lastName = lastNameValue,
+                    age = ageValueInt,
+                    city = cityValue,
+                    country = countryValue,
+                    height = heightFeetValue!!.toInt() * 12 + heightInchesValue!!.toInt(),
+                    weight = weightValueInt,
+                    sex = sexValue,
+                    activityLevel = activityLevelValue,
+                    bmr = bmrIntValue
+                )
+
+                model.setUserData(newUser)
+
+
             }
 
         }

@@ -12,5 +12,5 @@ class MainApplication : Application() {
     val database by lazy{ MainRoomDatabase.getDatabase(this,applicationScope)}
 
     //TODO: Add UserDao in this get instance
-    val repository by lazy{ MainRepository.getInstance(database.weatherDao(),applicationScope)}
+    val repository by lazy{ MainRepository.getInstance(database.weatherDao(), database.userDao(), applicationScope)}
 }

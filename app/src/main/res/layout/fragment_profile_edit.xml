@@ -235,7 +235,7 @@
                 android:layout_gravity="left"
                 android:layout_alignParentLeft="true"
                 android:layout_marginTop="10dp"
-                android:text="submit"
+                android:text="Submit"
                 android:id="@+id/submitButton"
                 />
 
