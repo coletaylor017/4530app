@@ -4,8 +4,8 @@ import androidx.room.*
 
 @Dao
 interface UserDao {
-    @Insert
-    suspend fun insert(user: UserTable)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(user: UserTable) : Long
 
     @Query("SELECT * FROM user_table")
     suspend fun getAll(): List<UserTable>
@@ -13,8 +13,8 @@ interface UserDao {
 //    @Query("SELECT * FROM user_table WHERE uid IN (:userIds)")
 //    suspend fun loadAllByIds(userIds: IntArray): List<UserTable>
 //
-//    @Query("SELECT * FROM user_table WHERE uid = :userId")
-//    suspend fun loadById(userId: Int): UserTable
+    @Query("SELECT * FROM user_table WHERE id = :userId")
+    suspend fun loadById(userId: Long): UserTable
 //
 //    /**
 //     * Update the specified users in the database.

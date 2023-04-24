@@ -32,8 +32,8 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
 import java.io.IOException
+import androidx.lifecycle.Observer
 import java.util.*
-import androidx.activity.viewModels
 
 class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListener, AdapterView.OnItemSelectedListener {
     // Variables to hold values of UI elements
@@ -48,6 +48,8 @@ class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListene
     private var sexValue: String? = null
     private var activityLevelValue: String? = null
     private var bmrValue: String? = null
+
+    private var currentUserId: Long? = null
 
     // Variables for UI elements
     private var firstNameTextEdit: EditText? = null
@@ -96,7 +98,7 @@ class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListene
     }
 
     interface ProfileEditDataPassingInterface {
-        fun passProfileData(data: Array<String?>?)
+        fun passProfileData()
     }
 
     override fun onAttach(context: Context) {
@@ -146,6 +148,9 @@ class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListene
         activityAdapter = setSpinnerData(R.id.activityLevelInput, activityLevelOptions, view)
 
         mIvPic = view.findViewById(R.id.iv_pic)
+
+        // Set the observer
+        model.dataUser.observe(requireActivity(), liveDataObserver)
 
         /** Retrieve all the field values for data persistence on rotate **/
         if (savedInstanceState != null) {
@@ -209,6 +214,14 @@ class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListene
 
         return view
     }
+
+    // TODO: this observer is unfinished.
+    private val liveDataObserver: Observer<UserTable> =
+        Observer { userData ->
+            if (userData != null) {
+                currentUserId = userData.id
+            }
+        }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun autofillLocation(locationLat: Double, locationLon: Double) {
@@ -429,10 +442,6 @@ class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListene
 
                 val bmrIntValue = calculateBMR(heightFeetValue, heightInchesValue, weightValue, sexValue, ageValue, activityLevelValue)
                 bmrValue = if (bmrIntValue!! > 0) bmrIntValue.toString() else "BMR"
-                val formValuesArray : Array<String?> = arrayOf(firstNameValue, lastNameValue, ageValue, cityValue,
-                    countryValue, heightFeetValue, heightInchesValue, weightValue, sexValue, activityLevelValue, bmrValue)
-                // Pass data back up to main activity
-                dataPasser!!.passProfileData(formValuesArray)
 
                 // Save user data to main repository
                 val newUser = UserTable(
@@ -450,7 +459,8 @@ class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListene
 
                 model.setUserData(newUser)
 
-
+                // Start the profile display frag
+                dataPasser!!.passProfileData()
             }
 
         }
