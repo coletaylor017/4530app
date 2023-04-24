@@ -4,10 +4,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-// Placeholder for ViewModel of main activity. Will be fully implemented after Repository and Room DB are finished.
 class MainViewModel(repository: MainRepository) :  ViewModel(){
     // Connect a live data object to the current bit of weather info
     private val weatherData: LiveData<WeatherTable> = repository.weatherData
+    private val userData: LiveData<UserTable> = repository.userData
 
     private var mRepository: MainRepository = repository
 
@@ -20,8 +20,16 @@ class MainViewModel(repository: MainRepository) :  ViewModel(){
     val dataWeather: LiveData<WeatherTable>
         get() = weatherData
 
+    // Returns the data contained in the live data object
+    val dataUser: LiveData<UserTable>
+        get() = userData
+
     fun setUserData(user: UserTable) {
         mRepository.setUserData(user)
+    }
+
+    fun getUserData(userId: Long) : UserTable? {
+        return mRepository.getUserData(userId)
     }
 }
 

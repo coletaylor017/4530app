@@ -23,23 +23,26 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.ClassCastException
 
 class ProfileDisplayFragment: Fragment() {
-    private var nameReceived: String? = null
-    private var ageReceived : String? = null
-    private var locationReceived : String? = null
-    private var feetReceived: String? = null
-    private var inchesReceived: String? = null
-    private var weightReceived: String? = null
-    private var sexReceived : String? = null
-    private var activityLevelReceived : String? = null
-    private var bmrReceived : String? = null
+    private var nameTextView: TextView? = null
+    private var ageTextView : TextView? = null
+    private var locationTextView : TextView? = null
+    private var heightTextView: TextView? = null
+    private var weightTextView: TextView? = null
+    private var sexTextView: TextView? = null
+    private var activityLevelTextView: TextView? = null
     private var bmrScore: TextView? = null
     private var mIvPic: ImageView? = null
+
     private var locationString: String = ""
+
+    private val mViewModel: MainViewModel by activityViewModels()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -50,6 +53,19 @@ class ProfileDisplayFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_profile_display, container, false)
+
+        // Get the UI elements
+        nameTextView = view.findViewById(R.id.name_value)
+        ageTextView = view.findViewById(R.id.age_value)
+        locationTextView = view.findViewById(R.id.location_value)
+        heightTextView = view.findViewById(R.id.height_value)
+        weightTextView = view.findViewById(R.id.weight_value)
+        sexTextView = view.findViewById(R.id.sex_value)
+        activityLevelTextView = view.findViewById(R.id.activity_level_value)
+        bmrScore = view.findViewById(R.id.bmr_score)
+
+        // Set the observer
+        mViewModel.dataUser.observe(requireActivity(), liveDataObserver)
 
         // Initialize the location manager. This will get an update on the users location while onCreate is running.
         val locationManager: LocationManager = requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -72,39 +88,6 @@ class ProfileDisplayFragment: Fragment() {
                 // Handle provider disabled
                 var yes : String? = null
             }
-        }
-
-
-
-        //Get the string data
-        if (arguments != null) {
-            nameReceived = requireArguments().getString("NAME")
-            ageReceived = requireArguments().getString("AGE")
-            locationReceived = requireArguments().getString("LOCATION")
-            feetReceived = requireArguments().getString("HEIGHT_FEET")
-            inchesReceived = requireArguments().getString("HEIGHT_INCHES")
-            weightReceived = requireArguments().getString("WEIGHT")
-            sexReceived = requireArguments().getString("SEX")
-            activityLevelReceived = requireArguments().getString("ACTIVITY_LEVEL")
-            bmrReceived = requireArguments().getString("BMR_SCORE")
-        }
-
-        // Display received data in text views
-        view.findViewById<TextView>(R.id.name_value)!!.text = nameReceived!!.toString()
-        view.findViewById<TextView>(R.id.age_value)!!.text = ageReceived!!.toString()
-        view.findViewById<TextView>(R.id.location_value)!!.text = locationReceived!!.toString()
-        view.findViewById<TextView>(R.id.height_value)!!.text = "$feetReceived\'$inchesReceived\""
-        view.findViewById<TextView>(R.id.weight_value)!!.text = weightReceived!!.toString()
-        view.findViewById<TextView>(R.id.sex_value)!!.text = sexReceived!!.toString()
-        view.findViewById<TextView>(R.id.activity_level_value)!!.text = activityLevelReceived!!.toString()
-
-        //Get the text view where we will display BMR score
-        bmrScore = view.findViewById(R.id.bmr_score)
-
-        if (bmrReceived == "0" || bmrReceived.isNullOrBlank()) {
-            bmrScore!!.text = "-"
-        } else {
-            bmrScore!!.text = bmrReceived
         }
 
         /** The next block retrieve the photo from cache and redraw them **/
@@ -148,6 +131,20 @@ class ProfileDisplayFragment: Fragment() {
 
         return view
     }
+
+    private val liveDataObserver: Observer<UserTable> =
+        Observer { userData ->
+            if (userData != null) {
+                nameTextView!!.text = userData!!.firstName + " " + userData!!.lastName
+                ageTextView!!.text = userData!!.age.toString()
+                locationTextView!!.text = userData!!.city + ", " + userData!!.country
+                heightTextView!!.text = (userData!!.height?.div(12)).toString() + "\' " + (userData!!.height?.rem(12)).toString() + "\""
+                weightTextView!!.text = userData!!.weight.toString() + "lbs"
+                sexTextView!!.text = userData!!.sex
+                activityLevelTextView!!.text = userData!!.activityLevel
+                bmrScore!!.text = userData!!.bmr.toString()
+            }
+        }
 
     /**
      * This method/function is hardcoded to retrieve the profile photo from the cache.

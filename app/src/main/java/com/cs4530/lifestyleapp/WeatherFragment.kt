@@ -12,11 +12,6 @@ import androidx.lifecycle.Observer
 import com.squareup.picasso.Picasso
 
 class WeatherFragment: Fragment() {
-    private var temperatureReceived : String? = null
-    private var highReceived : String? = null
-    private var lowReceived : String? = null
-    private var humidityReceived : String? = null
-
     private var temperatureTile : TextView? = null
     private var highTempTextView : TextView? = null
     private var lowTempTextView : TextView? = null
@@ -32,11 +27,11 @@ class WeatherFragment: Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_weather_view, container, false)
-        temperatureTile = view.findViewById<TextView>(R.id.weather_tile)
-        highTempTextView = view.findViewById<TextView>(R.id.high_temp_value)
-        lowTempTextView = view.findViewById<TextView>(R.id.low_temp_value)
-        humidityTextView = view.findViewById<TextView>(R.id.humidity_value)
-        iconImageView = view.findViewById<ImageView>(R.id.weather_icon)
+        temperatureTile = view.findViewById(R.id.weather_tile)
+        highTempTextView = view.findViewById(R.id.high_temp_value)
+        lowTempTextView = view.findViewById(R.id.low_temp_value)
+        humidityTextView = view.findViewById(R.id.humidity_value)
+        iconImageView = view.findViewById(R.id.weather_icon)
 
         mViewModel.dataWeather.observe(requireActivity(), liveDataObserver)
 

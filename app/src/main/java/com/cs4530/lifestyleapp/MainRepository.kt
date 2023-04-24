@@ -7,7 +7,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONException
-import kotlin.math.roundToInt
 
 class MainRepository private constructor(weatherDao: WeatherDao, userDao: UserDao) {
     // Weather fields
@@ -19,7 +18,6 @@ class MainRepository private constructor(weatherDao: WeatherDao, userDao: UserDa
     private var tempHigh: Int? = null
     private var tempLow: Int? = null
     private var weatherIcon: String? = null
-
 
     val userData = MutableLiveData<UserTable>()
     private var mUserDao: UserDao = userDao
@@ -51,7 +49,7 @@ class MainRepository private constructor(weatherDao: WeatherDao, userDao: UserDa
 
                     weatherData.postValue(data)
 
-                    insert()
+                    insertWeather()
                 } catch (e: JSONException) {
                     e.printStackTrace()
                 }
@@ -60,19 +58,41 @@ class MainRepository private constructor(weatherDao: WeatherDao, userDao: UserDa
     }
 
     fun setUserData(newUser: UserTable) {
-        mScope.launch(Dispatchers.IO){
+        mScope.launch {
             try {
                 userData.postValue(newUser)
 
-                mUserDao.insert(newUser)
+                insertUser(newUser)
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
         }
     }
 
+    fun getUserData(userId: Long) : UserTable? {
+        var user: UserTable? = null
+        mScope.launch(Dispatchers.IO){
+            try {
+                user = getUser(userId)
+            } catch (e: JSONException) {
+                e.printStackTrace()
+            }
+        }
+        return user
+    }
+
     @WorkerThread
-    suspend fun insert() {
+    suspend fun insertUser(newUser: UserTable): Long {
+        return mUserDao.insert(newUser)
+    }
+
+    @WorkerThread
+    suspend fun getUser(userId: Long) : UserTable? {
+        return mUserDao.loadById(userId)
+    }
+
+    @WorkerThread
+    suspend fun insertWeather() {
         if (temperature != null && tempHigh !=null && tempLow !=null && humidity !=null) {
             mWeatherDao.insert(WeatherTable(temperature = temperature!!, tempHigh = tempHigh!!, tempLow = tempLow!!, humidity = humidity!!, icon = weatherIcon!!))
         }
