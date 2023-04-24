@@ -215,11 +215,30 @@ class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListene
         return view
     }
 
-    // TODO: this observer is unfinished.
     private val liveDataObserver: Observer<UserTable> =
         Observer { userData ->
             if (userData != null) {
                 currentUserId = userData.id
+                firstNameTextEdit!!.setText(userData.firstName)
+                lastNameTextEdit!!.setText(userData.lastName)
+                ageSlider!!.value = userData.age!!.toFloat()
+                cityTextEdit!!.setText(userData.city)
+                val countryPosition =
+                    countryAdapter!!.getPosition(userData.country)
+                countrySpinner!!.setSelection(countryPosition)
+                val feetPosition =
+                    feetAdapter!!.getPosition((userData.height!!/12).toString())
+                heightFeetSpinner!!.setSelection(feetPosition)
+                val inchesPosition =
+                    inchesAdapter!!.getPosition((userData.height!! % 12).toString())
+                heightInchesSpinner!!.setSelection(inchesPosition)
+                weightSlider!!.value = userData.weight!!.toFloat()
+                val sexPosition = sexAdapter!!.getPosition(userData.sex)
+                sexSpinner!!.setSelection(sexPosition)
+                val activityPosition =
+                    activityAdapter!!.getPosition(userData.activityLevel)
+                activityLevelSpinner!!.setSelection(activityPosition)
+
             }
         }
 
