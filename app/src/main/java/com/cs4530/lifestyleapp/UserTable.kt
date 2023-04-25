@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName
 @Entity(tableName = "user_table")
 data class UserTable(
     @field:ColumnInfo(name = "id")
-    @field:PrimaryKey(autoGenerate = false)
+    @field:PrimaryKey(autoGenerate = true)
     val id : Long = 0,
 
     @field:ColumnInfo(name = "first_name")
