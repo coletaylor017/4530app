@@ -33,6 +33,7 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
 import java.io.IOException
 import androidx.lifecycle.Observer
+import kotlinx.coroutines.runBlocking
 import java.util.*
 
 class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListener, AdapterView.OnItemSelectedListener {
@@ -464,6 +465,7 @@ class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListene
 
                 // Save user data to main repository
                 val newUser = UserTable(
+                    id = 0, // db should only ever have one user
                     firstName = firstNameValue,
                     lastName = lastNameValue,
                     age = ageValueInt,
@@ -476,7 +478,10 @@ class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListene
                     bmr = bmrIntValue
                 )
 
-                model.setUserData(newUser)
+                runBlocking {
+                    model.insertUser(newUser)
+                }
+
 
                 // Start the profile display frag
                 dataPasser!!.passProfileData()

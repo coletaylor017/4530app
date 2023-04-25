@@ -92,6 +92,7 @@ class MainRepository private constructor(weatherDao: WeatherDao, userDao: UserDa
         return mUserDao.loadById(userId)
     }
 
+    @WorkerThread
     suspend fun getUserData() : List<UserTable?> {
         return mUserDao.getAll()
     }

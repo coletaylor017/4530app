@@ -15,13 +15,9 @@ interface UserDao {
 //
     @Query("SELECT * FROM user_table WHERE id = :userId")
     suspend fun loadById(userId: Long): UserTable
-//
-//    /**
-//     * Update the specified users in the database.
-//     */
-//    @Update
-//    suspend fun update(vararg users: UserTable)
-//
+
+    @Delete
+    suspend fun delete(user: UserTable)
 //    /**
 //     * Delete the specified users from the database.
 //     */
