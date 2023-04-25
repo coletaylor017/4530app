@@ -60,7 +60,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
         //Get UI elements
         bottomNavBar = findViewById(R.id.bottom_navigation_bar)
-        //Consider removing this to update BMR from profile button
         bmrButton = findViewById(R.id.bmr_label)
         bottomNavBar!!.setOnItemSelectedListener(this)
 
