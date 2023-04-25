@@ -24,6 +24,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.navigation.NavigationBarView
 import androidx.lifecycle.Observer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 import java.io.IOException
@@ -31,7 +34,7 @@ import java.util.*
 import kotlin.math.roundToInt
 
 
-class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener, ProfileEditFragment.ProfileEditDataPassingInterface {
+class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener, ProfileEditFragment.ProfileEditDataPassingInterface, ProfileDisplayFragment.ProfileDisplayNavigationInterface {
     // UI element vars
     private var bottomNavBar: BottomNavigationView? = null
     private var bmrButton: ExtendedFloatingActionButton? = null
@@ -141,14 +144,30 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_profile -> {
-                //Instantiate the fragment
-                val profileEditFragment = ProfileEditFragment(mViewModel)
+                // Check if there is any user data
 
-                //Replace the fragment container
-                val fTrans = supportFragmentManager.beginTransaction()
-                fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
-                fTrans.commit()
-                true
+                var users: List<UserTable?> = listOf()
+                runBlocking {
+                    launch(Dispatchers.IO) {
+                        users = mViewModel.getUserData()
+                    }
+                }
+
+                if (users.isNotEmpty()) {
+                    // if there is are >= 1 users, navigate to profile display page
+                    currentUser = users[0]
+                    this.passProfileData()
+                }
+                else {
+                    // if there are no users, navigate to profile edit page
+                    currentUser = null
+
+                    val profileEditFragment = ProfileEditFragment(mViewModel)
+                    val fTrans = supportFragmentManager.beginTransaction()
+                    fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
+                    fTrans.commit()
+                    true
+                }
             }
             R.id.action_weather -> {
                 val sanitizedLocation = currentCity!!.replace(' ', '&')
@@ -180,6 +199,19 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
             R.id.fragment_placeholder,
             profileDisplayFragment,
             "Profile_Display_Frag"
+        )
+        fTrans.commit()
+    }
+
+
+    override fun navigateToEditPage() {
+        val profileEditFragment = ProfileEditFragment(mViewModel)
+
+        val fTrans = supportFragmentManager.beginTransaction()
+        fTrans.replace(
+            R.id.fragment_placeholder,
+            profileEditFragment,
+            "Profile_Edit_Frag"
         )
         fTrans.commit()
     }
