@@ -44,8 +44,19 @@ class ProfileDisplayFragment: Fragment() {
 
     private val mViewModel: MainViewModel by activityViewModels()
 
+    interface ProfileDisplayNavigationInterface {
+        fun navigateToEditPage()
+    }
+
+    var dataPasser: ProfileDisplayNavigationInterface? = null
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        dataPasser = try {
+            context as ProfileDisplayNavigationInterface
+        } catch (e: ClassCastException) {
+            throw ClassCastException("$context must implement ProfileDisplayFragment.DataPassingInterface")
+        }
     }
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -126,6 +137,11 @@ class ProfileDisplayFragment: Fragment() {
                 }catch(ex: ActivityNotFoundException) {
                     Toast.makeText(requireContext(), "Map Not Available", Toast.LENGTH_SHORT).show()
                 }
+            }
+
+            val editButton = view.findViewById<Button>(R.id.editButton)
+            editButton.setOnClickListener {
+                dataPasser?.navigateToEditPage()
             }
         }
 

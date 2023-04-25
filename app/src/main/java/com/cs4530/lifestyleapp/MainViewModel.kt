@@ -31,6 +31,10 @@ class MainViewModel(repository: MainRepository) :  ViewModel(){
     fun getUserData(userId: Long) : UserTable? {
         return mRepository.getUserData(userId)
     }
+
+    suspend fun getUserData() : List<UserTable?> {
+        return mRepository.getUserData()
+    }
 }
 
 // This factory class allows us to define custom constructors for the view model
