@@ -33,6 +33,8 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
 import java.io.IOException
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.*
 
@@ -478,13 +480,14 @@ class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListene
                     bmr = bmrIntValue
                 )
 
-                runBlocking {
-                    model.insertUser(newUser)
-                }
+                // launch coroutine to insert user into db
+//                lifecycleScope.launch {
+//                    model.insertUser(newUser)
 
+                    // Start the profile display frag
+                    dataPasser!!.passProfileData()
+//                }
 
-                // Start the profile display frag
-                dataPasser!!.passProfileData()
             }
 
         }

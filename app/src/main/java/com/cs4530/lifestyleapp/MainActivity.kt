@@ -25,6 +25,7 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.navigation.NavigationBarView
 import androidx.lifecycle.Observer
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -42,7 +43,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
     // Data vars
     private var currentCity: String? = null
     private var bmrValue: String? = null
-    private var currentUser: UserTable? = null
 
     // Location variables
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -146,29 +146,21 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         when (item.itemId) {
             R.id.action_profile -> {
                 // Check if there is any user data
-
                 var users: List<UserTable?> = listOf()
-                runBlocking {
-                    launch(Dispatchers.IO) {
-                        users = mViewModel.getUserData()
-                    }
-                }
 
-                if (users.isNotEmpty()) {
-                    // if there is are >= 1 users, navigate to profile display page
-                    currentUser = users[0]
-                    this.passProfileData()
-                }
-                else {
-                    // if there are no users, navigate to profile edit page
-                    currentUser = null
 
-                    val profileEditFragment = ProfileEditFragment(mViewModel)
-                    val fTrans = supportFragmentManager.beginTransaction()
-                    fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
-                    fTrans.commit()
-                    true
-                }
+                // Launch coroutine to get user data
+//                runBlocking {
+//                    launch(Dispatchers.IO) {
+//                        users = mViewModel.getUserData()
+//                        if (users.isNotEmpty())
+                        // if there is are >= 1 users, navigate to profile display page
+                            passProfileData()
+//                        else
+//                        // if there are no users, navigate to profile edit page
+//                            navigateToEditPage()
+//                    }
+//                }
             }
             R.id.action_weather -> {
                 val sanitizedLocation = currentCity!!.replace(' ', '&')
@@ -177,9 +169,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
                 val fTrans = supportFragmentManager.beginTransaction()
                 fTrans.replace(R.id.fragment_placeholder, weatherFragment, "Weather_Frag")
                 fTrans.commit()
-                true
             }
-            else -> false
         }
         return true
     }
