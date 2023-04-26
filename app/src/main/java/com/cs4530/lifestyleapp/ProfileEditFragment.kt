@@ -25,9 +25,9 @@ import android.content.pm.PackageManager
 import android.location.*
 import android.location.Geocoder.GeocodeListener
 import android.text.TextUtils
-import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.activityViewModels
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority.PRIORITY_BALANCED_POWER_ACCURACY
@@ -35,7 +35,7 @@ import java.io.IOException
 import androidx.lifecycle.Observer
 import java.util.*
 
-class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListener, AdapterView.OnItemSelectedListener {
+class ProfileEditFragment(): Fragment(), View.OnClickListener, AdapterView.OnItemSelectedListener {
     // Variables to hold values of UI elements
     private var firstNameValue: String? = null
     private var lastNameValue: String? = null
@@ -91,11 +91,7 @@ class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListene
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private var gcListener : GCListener = GCListener()
 
-    private var model: MainViewModel
-
-    init {
-        this.model = model
-    }
+    private val model: MainViewModel by activityViewModels()
 
     interface ProfileEditDataPassingInterface {
         fun passProfileData()

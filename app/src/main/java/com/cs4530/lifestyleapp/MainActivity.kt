@@ -67,15 +67,15 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
         mViewModel.dataUser.observe(this, liveDataObserver)
 
-
         //Instantiate the fragment
-        val profileEditFragment = ProfileEditFragment(mViewModel)
+        if (savedInstanceState == null) {
+            val profileEditFragment = ProfileEditFragment()
 
-        //Replace the fragment container
-        val fTrans = supportFragmentManager.beginTransaction()
-        fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
-        fTrans.commit()
-
+            //Replace the fragment container
+            val fTrans = supportFragmentManager.beginTransaction()
+            fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
+            fTrans.commit()
+        }
 
         // Permissions stuff for location
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -142,7 +142,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
         when (item.itemId) {
             R.id.action_profile -> {
                 //Instantiate the fragment
-                val profileEditFragment = ProfileEditFragment(mViewModel)
+                val profileEditFragment = ProfileEditFragment()
 
                 //Replace the fragment container
                 val fTrans = supportFragmentManager.beginTransaction()
