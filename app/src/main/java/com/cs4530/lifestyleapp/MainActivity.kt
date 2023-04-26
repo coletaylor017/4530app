@@ -150,17 +150,17 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
 
                 // Launch coroutine to get user data
-//                runBlocking {
-//                    launch(Dispatchers.IO) {
-//                        users = mViewModel.getUserData()
-//                        if (users.isNotEmpty())
+                runBlocking {
+                    launch(Dispatchers.IO) {
+                        users = mViewModel.getUserData()
+                        if (users.isNotEmpty())
                         // if there is are >= 1 users, navigate to profile display page
                             passProfileData()
-//                        else
-//                        // if there are no users, navigate to profile edit page
-//                            navigateToEditPage()
-//                    }
-//                }
+                        else
+                        // if there are no users, navigate to profile edit page
+                            navigateToEditPage()
+                    }
+                }
             }
             R.id.action_weather -> {
                 val sanitizedLocation = currentCity!!.replace(' ', '&')

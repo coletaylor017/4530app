@@ -466,7 +466,7 @@ class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListene
                 bmrValue = if (bmrIntValue!! > 0) bmrIntValue.toString() else "BMR"
 
                 // Save user data to main repository
-                val newUser = UserTable(
+                val userData = UserTable(
                     id = 0, // db should only ever have one user
                     firstName = firstNameValue,
                     lastName = lastNameValue,
@@ -481,12 +481,12 @@ class ProfileEditFragment(model: MainViewModel): Fragment(), View.OnClickListene
                 )
 
                 // launch coroutine to insert user into db
-//                lifecycleScope.launch {
-//                    model.insertUser(newUser)
+                lifecycleScope.launch {
+                    model.setUserData(userData)
 
                     // Start the profile display frag
                     dataPasser!!.passProfileData()
-//                }
+                }
 
             }
 
