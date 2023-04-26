@@ -24,6 +24,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
 import com.google.android.material.navigation.NavigationBarView
 import androidx.lifecycle.Observer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 
 import java.io.IOException
@@ -31,7 +35,7 @@ import java.util.*
 import kotlin.math.roundToInt
 
 
-class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener, ProfileEditFragment.ProfileEditDataPassingInterface {
+class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener, ProfileEditFragment.ProfileEditDataPassingInterface, ProfileDisplayFragment.ProfileDisplayNavigationInterface {
     // UI element vars
     private var bottomNavBar: BottomNavigationView? = null
     private var bmrButton: ExtendedFloatingActionButton? = null
@@ -39,7 +43,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
     // Data vars
     private var currentCity: String? = null
     private var bmrValue: String? = null
-    private var currentUser: UserTable? = null
 
     // Location variables
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -60,6 +63,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
         //Get UI elements
         bottomNavBar = findViewById(R.id.bottom_navigation_bar)
+        //Consider removing this to update BMR from profile button
         bmrButton = findViewById(R.id.bmr_label)
         bottomNavBar!!.setOnItemSelectedListener(this)
 
@@ -67,15 +71,15 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
         mViewModel.dataUser.observe(this, liveDataObserver)
 
-        //Instantiate the fragment
-        if (savedInstanceState == null) {
-            val profileEditFragment = ProfileEditFragment()
 
-            //Replace the fragment container
-            val fTrans = supportFragmentManager.beginTransaction()
-            fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
-            fTrans.commit()
-        }
+        //Instantiate the fragment
+        val profileEditFragment = ProfileEditFragment(mViewModel)
+
+        //Replace the fragment container
+        val fTrans = supportFragmentManager.beginTransaction()
+        fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
+        fTrans.commit()
+
 
         // Permissions stuff for location
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -141,14 +145,22 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_profile -> {
-                //Instantiate the fragment
-                val profileEditFragment = ProfileEditFragment()
+                // Check if there is any user data
+                var users: List<UserTable?> = listOf()
 
-                //Replace the fragment container
-                val fTrans = supportFragmentManager.beginTransaction()
-                fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
-                fTrans.commit()
-                true
+
+                // Launch coroutine to get user data
+                runBlocking {
+                    launch(Dispatchers.IO) {
+                        users = mViewModel.getUserData()
+                        if (users.isNotEmpty())
+                        // if there is are >= 1 users, navigate to profile display page
+                            passProfileData()
+                        else
+                        // if there are no users, navigate to profile edit page
+                            navigateToEditPage()
+                    }
+                }
             }
             R.id.action_weather -> {
                 val sanitizedLocation = currentCity!!.replace(' ', '&')
@@ -157,9 +169,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
                 val fTrans = supportFragmentManager.beginTransaction()
                 fTrans.replace(R.id.fragment_placeholder, weatherFragment, "Weather_Frag")
                 fTrans.commit()
-                true
             }
-            else -> false
         }
         return true
     }
@@ -180,6 +190,19 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
             R.id.fragment_placeholder,
             profileDisplayFragment,
             "Profile_Display_Frag"
+        )
+        fTrans.commit()
+    }
+
+
+    override fun navigateToEditPage() {
+        val profileEditFragment = ProfileEditFragment(mViewModel)
+
+        val fTrans = supportFragmentManager.beginTransaction()
+        fTrans.replace(
+            R.id.fragment_placeholder,
+            profileEditFragment,
+            "Profile_Edit_Frag"
         )
         fTrans.commit()
     }
