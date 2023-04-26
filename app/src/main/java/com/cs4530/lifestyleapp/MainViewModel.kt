@@ -28,16 +28,8 @@ class MainViewModel(repository: MainRepository) :  ViewModel(){
         mRepository.setUserData(user)
     }
 
-    suspend fun insertUser(user: UserTable) {
-        mRepository.insertUser(user)
-    }
-
     fun getUserData(userId: Long) : UserTable? {
         return mRepository.getUserData(userId)
-    }
-
-    suspend fun getUserData() : List<UserTable?> {
-        return mRepository.getUserData()
     }
 }
 

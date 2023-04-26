@@ -35,7 +35,7 @@ import java.util.*
 import kotlin.math.roundToInt
 
 
-class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener, ProfileEditFragment.ProfileEditDataPassingInterface, ProfileDisplayFragment.ProfileDisplayNavigationInterface {
+class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener, ProfileEditFragment.ProfileEditDataPassingInterface {
     // UI element vars
     private var bottomNavBar: BottomNavigationView? = null
     private var bmrButton: ExtendedFloatingActionButton? = null
@@ -63,7 +63,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
         //Get UI elements
         bottomNavBar = findViewById(R.id.bottom_navigation_bar)
-        //Consider removing this to update BMR from profile button
         bmrButton = findViewById(R.id.bmr_label)
         bottomNavBar!!.setOnItemSelectedListener(this)
 
@@ -71,15 +70,15 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
         mViewModel.dataUser.observe(this, liveDataObserver)
 
-
         //Instantiate the fragment
-        val profileEditFragment = ProfileEditFragment(mViewModel)
+        if (savedInstanceState == null) {
+            val profileEditFragment = ProfileEditFragment()
 
-        //Replace the fragment container
-        val fTrans = supportFragmentManager.beginTransaction()
-        fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
-        fTrans.commit()
-
+            //Replace the fragment container
+            val fTrans = supportFragmentManager.beginTransaction()
+            fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
+            fTrans.commit()
+        }
 
         // Permissions stuff for location
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -190,19 +189,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
             R.id.fragment_placeholder,
             profileDisplayFragment,
             "Profile_Display_Frag"
-        )
-        fTrans.commit()
-    }
-
-
-    override fun navigateToEditPage() {
-        val profileEditFragment = ProfileEditFragment(mViewModel)
-
-        val fTrans = supportFragmentManager.beginTransaction()
-        fTrans.replace(
-            R.id.fragment_placeholder,
-            profileEditFragment,
-            "Profile_Edit_Frag"
         )
         fTrans.commit()
     }

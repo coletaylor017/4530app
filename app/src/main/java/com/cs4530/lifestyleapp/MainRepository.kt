@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.json.JSONException
 
 class MainRepository private constructor(weatherDao: WeatherDao, userDao: UserDao) {
@@ -90,11 +89,6 @@ class MainRepository private constructor(weatherDao: WeatherDao, userDao: UserDa
     @WorkerThread
     suspend fun getUser(userId: Long) : UserTable? {
         return mUserDao.loadById(userId)
-    }
-
-    @WorkerThread
-    suspend fun getUserData() : List<UserTable?> {
-        return mUserDao.getAll()
     }
 
     @WorkerThread
