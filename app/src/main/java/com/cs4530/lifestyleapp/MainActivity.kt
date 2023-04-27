@@ -7,13 +7,11 @@ import android.location.Geocoder
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.HandlerCompat
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
@@ -25,14 +23,12 @@ import com.google.android.material.floatingactionbutton.ExtendedFloatingActionBu
 import com.google.android.material.navigation.NavigationBarView
 import androidx.lifecycle.Observer
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 
 import java.io.IOException
 import java.util.*
-import kotlin.math.roundToInt
 
 
 class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListener, ProfileEditFragment.ProfileEditDataPassingInterface, ProfileDisplayFragment.ProfileDisplayNavigationInterface {
@@ -42,7 +38,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
     // Data vars
     private var currentCity: String? = null
-    private var bmrValue: String? = null
 
     // Location variables
     private lateinit var fusedLocationClient: FusedLocationProviderClient
@@ -73,13 +68,14 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
 
         //Instantiate the fragment
-        val profileEditFragment = ProfileEditFragment(mViewModel)
+        if (savedInstanceState == null) {
+            val profileEditFragment = ProfileEditFragment()
 
-        //Replace the fragment container
-        val fTrans = supportFragmentManager.beginTransaction()
-        fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
-        fTrans.commit()
-
+            //Replace the fragment container
+            val fTrans = supportFragmentManager.beginTransaction()
+            fTrans.replace(R.id.fragment_placeholder, profileEditFragment, "Profile_Edit_Frag")
+            fTrans.commit()
+        }
 
         // Permissions stuff for location
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -129,17 +125,6 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putString("BMR_SCORE", bmrValue)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-        bmrButton!!.text = bmrValue
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -196,7 +181,7 @@ class MainActivity : AppCompatActivity(), NavigationBarView.OnItemSelectedListen
 
 
     override fun navigateToEditPage() {
-        val profileEditFragment = ProfileEditFragment(mViewModel)
+        val profileEditFragment = ProfileEditFragment()
 
         val fTrans = supportFragmentManager.beginTransaction()
         fTrans.replace(
