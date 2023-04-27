@@ -11,7 +11,6 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.LayoutInflater
@@ -39,13 +38,25 @@ class ProfileDisplayFragment: Fragment() {
     private var activityLevelTextView: TextView? = null
     private var bmrScore: TextView? = null
     private var mIvPic: ImageView? = null
+    private var editButton: Button? = null
 
     private var locationString: String = ""
 
     private val mViewModel: MainViewModel by activityViewModels()
 
+    interface ProfileDisplayNavigationInterface {
+        fun navigateToEditPage()
+    }
+
+    var dataPasser: ProfileDisplayNavigationInterface? = null
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        dataPasser = try {
+            context as ProfileDisplayNavigationInterface
+        } catch (e: ClassCastException) {
+            throw ClassCastException("$context must implement ProfileDisplayFragment.DataPassingInterface")
+        }
     }
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -63,6 +74,8 @@ class ProfileDisplayFragment: Fragment() {
         sexTextView = view.findViewById(R.id.sex_value)
         activityLevelTextView = view.findViewById(R.id.activity_level_value)
         bmrScore = view.findViewById(R.id.bmr_score)
+        editButton = view.findViewById<Button>(R.id.editButton)
+
 
         // Set the observer
         mViewModel.dataUser.observe(requireActivity(), liveDataObserver)
@@ -111,21 +124,30 @@ class ProfileDisplayFragment: Fragment() {
                 hikeButtonDisabled.isEnabled = false
             }
         }
-        else
-        {
-            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, locationListener) //Suppressed MissingPermission for this
+        else {
+            locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                0,
+                0f,
+                locationListener
+            ) //Suppressed MissingPermission for this
 
             /** The next block listens for find hike button and opens the map**/
             val hikeButton = view.findViewById<Button>(R.id.find_hike)
             hikeButton.setOnClickListener {
-                val searchUri = Uri.parse("geo:" + locationString + "?q=hikes near me") //Instead of getting location in search, utilized maps' automatic search from location
+                val searchUri =
+                    Uri.parse("geo:" + locationString + "?q=hikes near me") //Instead of getting location in search, utilized maps' automatic search from location
                 //create map intent
                 val mapIntent = Intent(Intent.ACTION_VIEW, searchUri)
-                try{
+                try {
                     startActivity(mapIntent)
-                }catch(ex: ActivityNotFoundException) {
+                } catch (ex: ActivityNotFoundException) {
                     Toast.makeText(requireContext(), "Map Not Available", Toast.LENGTH_SHORT).show()
                 }
+            }
+
+            editButton?.setOnClickListener {
+                dataPasser?.navigateToEditPage()
             }
         }
 

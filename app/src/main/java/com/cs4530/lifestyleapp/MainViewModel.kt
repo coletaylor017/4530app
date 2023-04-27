@@ -28,8 +28,9 @@ class MainViewModel(repository: MainRepository) :  ViewModel(){
         mRepository.setUserData(user)
     }
 
-    fun getUserData(userId: Long) : UserTable? {
-        return mRepository.getUserData(userId)
+
+    suspend fun getUserData() : List<UserTable?> {
+        return mRepository.getUserData()
     }
 }
 
